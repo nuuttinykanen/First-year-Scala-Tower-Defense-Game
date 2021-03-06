@@ -1,0 +1,3 @@
+class SupportTower extends Tower {
+
+}

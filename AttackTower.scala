@@ -1,0 +1,3 @@
+class AttackTower extends Tower {
+
+}
