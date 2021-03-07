@@ -1,16 +1,19 @@
 class Game(player: Player, waves: Vector[Wave], map: Map, towers: TowerStore) {
 
-def startWave() = ???
+ private var round = 1
+ private var wave = this.waves.head
+ private var waveList = waves
 
-def endWave() = ???
+ def startWave() = ???
 
-def endGame() = ???
+ def endWave() = {
+   waveList = waveList.drop(1)
+   if(waveList.isEmpty) endGame()
+ }
 
-def passTime() = ???
-
-def spawnEnemy(enemy: Enemy) = ???
-
-def placeTower(map: Map, tower: Tower, x: Double, y: Double) = ???
-
+ def endGame() = ???
+ def passTime() = ???
+ def spawnEnemy(enemy: Enemy) = ???
+ def placeTower(map: Map, tower: Tower, x: Double, y: Double) = ???
 
 }

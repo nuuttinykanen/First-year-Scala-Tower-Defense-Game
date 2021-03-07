@@ -1,6 +1,6 @@
 import scala.swing._
 
-package object gui {
+package object myGui {
 
   val calc = 3 % 3
 }

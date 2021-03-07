@@ -19,5 +19,13 @@ def changeStatus(newStatus: Status)() = currentStatus = newStatus
 def move(): Unit
 }
 
+class Zombie extends Enemy(20, 10, 10, new Status, Vector[Status](), Vector[Enemy]()) {
+ def move() = changeHealth(20)()
+}
+
+class ZombieCarriage extends Enemy(20, 10, 10, new Status, Vector[Status](), Vector[Enemy](new Zombie, new Zombie, new Zombie)) {
+ def move() = changeHealth(30)()
+}
+
 
 
