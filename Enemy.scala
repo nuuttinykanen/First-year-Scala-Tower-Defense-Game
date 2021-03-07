@@ -1,3 +1,5 @@
+import o1.grid.GridPos
+
 abstract class Enemy(health: Int, speed: Int, moneyDrop: Int, status: Status, immunitites: Vector[Status], enemiesInside: Vector[Enemy]) {
 
 private var currentLocation: GridPos = new GridPos(0, 0)

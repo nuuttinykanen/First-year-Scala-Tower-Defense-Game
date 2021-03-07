@@ -5,16 +5,53 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
     </content>
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-sdk-2.13.3" level="application" />
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="O1LibraryTower" level="project" />
+    <orderEntry type="library" name="O1LibraryTowerDef" level="project" />
     <orderEntry type="module-library">
       <library>
+        <ANNOTATIONS>
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
+        </ANNOTATIONS>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../Kierros 2/O1Library" />
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
         </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <JAVADOC>
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
+        </JAVADOC>
+        <NATIVE>
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
+        </NATIVE>
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
+          <root url="file://$MODULE_DIR$/../1.3/O1Library" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/../1.3/O1Library" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../1.3/O1Library" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="O1LibraryTower2">
+        <ANNOTATIONS>
+          <root url="file://$MODULE_DIR$/lib/O1Library" />
+        </ANNOTATIONS>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib/O1Library" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="file://$MODULE_DIR$/lib/O1Library" />
+        </JAVADOC>
+        <NATIVE>
+          <root url="file://$MODULE_DIR$/lib/O1Library" />
+        </NATIVE>
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/lib/O1Library" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib/O1Library" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/O1Library" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>
