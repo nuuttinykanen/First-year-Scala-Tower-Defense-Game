@@ -39,11 +39,10 @@ object formGame {
    for(each <- text.tail) {
 
      var waveNumber = 1
-      var examineLetter = each(0)
       var waveNumberString = ""
       var index = 0
       while(each.drop(4)(index).isDigit) {
-        waveNumberString += examineLetter
+        waveNumberString += each.drop(4)(index)
         index += 1
       }
      waveNumber = waveNumberString.toInt
