@@ -1,4 +1,4 @@
-package o1.grid
+package lib.grid
 
 
 /** The class `CompassDir` represents the cardinal compass directions in a grid-like coordinate system.
@@ -7,8 +7,6 @@ package o1.grid
   *
   * All the `CompassDir` objects are immutable.
   *
-  * This class and its instances have aliases in the top-level package [[o1]], so they are accessible
-  * to students simply via `import o1._`.
   *
   * @see [[GridPos]]
   * @param xStep  the change in x coordinate if one moves one step in this direction. For instance, `West` has an `xStep` of -1 and `North` has an `xStep` of 0.
@@ -36,22 +34,12 @@ sealed abstract class CompassDir(val xStep: Int, val yStep: Int) extends Product
 
 /** This companion object of [[CompassDir class `CompassDir`]] provides a selection of related
   * constants and utility methods.
-  *
-  * This object has an alias in the top-level package [[o1]], so it’s accessible  to students
-  * simply via `import o1._`. */
+  **/
 object CompassDir {
 
-  /** This immutable singleton object represents the northwardly compass direction. It’s one of the four predefined instances of
-    * class `CompassDir`. It has an alias in the top-level package [[o1]], so it’s accessible to students simply via `import o1._`. */
   case object North extends CompassDir( 0,-1)
-  /** This immutable singleton object represents the eastwardly compass direction. It’s one of the four predefined instances of
-    * class `CompassDir`. It has an alias in the top-level package [[o1]], so it’s accessible to students simply via `import o1._`. */
   case object East  extends CompassDir( 1, 0)
-  /** This immutable singleton object represents the southwardly compass direction. It’s one of the four predefined instances of
-    * class `CompassDir`. It has an alias in the top-level package [[o1]], so it’s accessible to students simply via `import o1._`. */
   case object South extends CompassDir( 0, 1)
-  /** This immutable singleton object represents the westwardly compass direction. It’s one of the four predefined instances of
-    * class `CompassDir`. It has an alias in the top-level package [[o1]], so it’s accessible to students simply via `import o1._`. */
   case object West  extends CompassDir(-1, 0)
 
 

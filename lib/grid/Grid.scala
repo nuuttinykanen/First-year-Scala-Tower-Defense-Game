@@ -1,8 +1,10 @@
-package o1.grid
+package lib.grid
 
 import scala.reflect.ClassTag
-import o1.util.ConvenientInt
-import scala.util.{Try,Success,Failure}
+import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
+
+
 
 /** The class `Grid` represents rectangular grids that contain elements of a particular
   * kind. Each element in a grid is located at a unique pair of coordinates, represented
@@ -23,16 +25,12 @@ import scala.util.{Try,Success,Failure}
   * Upon creation, a `Grid` initializes itself by calling [[initialElements]], which
   * produces an initial state for the grid.
   *
-  * This class has an alias in the top-level package [[o1]], so it’s accessible to students
-  * simply via `import o1._`.
-  *
   * @param width   the number of elements in each row of the grid
   * @param height  the number of elements in each column of the grid */
 abstract class Grid[Element: ClassTag](val width: Int, val height: Int) {
 
   /** the number of elements in this grid, in total. (Equals `width` times `height`.) */
   val size = width * height
-
 
   private val contents: Array[Array[Element]] = {
     val elems = try { this.initialElements } catch { case npe: NullPointerException => throw new RuntimeException("Grid initialization failed with a NullPointerException.\nPossible cause: trying to access an element’s (still nonexistent) neighbors or other parts of the unready grid while initializing.", npe) }
@@ -48,6 +46,18 @@ abstract class Grid[Element: ClassTag](val width: Int, val height: Int) {
     this.contents(location.x)(location.y)
   }
 
+  def reverse(w: Short): Short = {
+   var binary = mutable.Buffer[Char]()
+   for(index <- 1 to 16) {
+     binary += '0'
+   }
+   for(index <- 0 until 16) {
+     if(((w >> index) & 1) == 1) {
+       binary.update(index, '1')
+     }
+   }
+   binary.toString.toShort
+  }
 
   /** Modifies the grid by replacing the existing element at the given location with the new element.
     * @param location    a location on the grid (must be within range)
@@ -59,7 +69,7 @@ abstract class Grid[Element: ClassTag](val width: Int, val height: Int) {
 
 
   /** Checks whether the grid contains the given x and y coordinates. */
-  private def contains(x: Int, y: Int) = x.isBetween(0, this.width) && y.isBetween(0, this.height)
+  private def contains(x: Int, y: Int) = x < this.width && y < this.height && x > 0 && y > 0
 
 
   /** Determines whether the grid contains the given pair of coordinates.

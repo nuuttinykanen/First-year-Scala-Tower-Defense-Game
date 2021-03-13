@@ -1,5 +1,5 @@
 
-package o1.grid
+package lib.grid
 
 import CompassDir._
 
@@ -11,8 +11,6 @@ import CompassDir._
   *
   * `GridPos` objecta are immutable.
   *
-  * This class has an alias in the top-level package [[o1]], so it’s accessible to students
-  * simply via `import o1._`.
   *
   * @param x  an x coordinate
   * @param y  a y coordinate */

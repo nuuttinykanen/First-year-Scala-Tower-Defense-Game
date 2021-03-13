@@ -19,7 +19,9 @@ class Player(name: String, health: Int, money: Int) {
     affordable.toVector
  }
 
- def buyTower(tower: Tower)() = ???
+ def buyTower(tower: Tower)() = {
+   val cost = tower.getCost
+ }
  def sellTower(tower: Tower)() = ???
 
  def upgradeTower(tower: Tower)() = ???

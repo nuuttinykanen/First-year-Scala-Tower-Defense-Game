@@ -6,7 +6,7 @@ import java.io.FileWriter
 import java.io.BufferedWriter
 import java.io.BufferedReader
 
-object FileReader {
+object InfoReader {
   /**
    * Write a method that reads a file using a FileReader to read the file
    * and a BufferedReader to read the lines in the file. Use the

@@ -1,4 +1,4 @@
-import o1.grid.GridPos
+import lib.grid.GridPos
 
 abstract class Enemy(health: Int, speed: Int, moneyDrop: Int, status: Status, immunitites: Vector[Status], enemiesInside: Vector[Enemy]) {
 
