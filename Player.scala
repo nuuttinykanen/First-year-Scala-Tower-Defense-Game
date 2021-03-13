@@ -1,7 +1,7 @@
 import scala.collection.mutable
 import scala.collection.mutable.Buffer
 
-class Player(name: String, health: Int, money: Int) {
+class Player(health: Int, money: Int) {
 
  private var currentHealth = health
  private var currentMoney = money
