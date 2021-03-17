@@ -19,6 +19,6 @@ class Game(player: Player, waves: Vector[Wave]) {
  def endGame() = ???
  def passTime() = ???
  def spawnEnemy(enemy: Enemy) = ???
- def placeTower(map: Map, tower: Tower, x: Double, y: Double) = ???
+ def placeTower(map: LevelMap, tower: Tower, x: Double, y: Double) = ???
 
 }

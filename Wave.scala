@@ -1,8 +1,8 @@
-class Wave(enemies: Vector[Enemy]) {
+class Wave(enemyMap: Map[Enemy, Int]) {
 
- private var enemiesLeft: Vector[Enemy] = enemies
+ private var enemiesLeft: Map[Enemy, Int] = enemyMap
 
- def popNext: Option[Enemy] = {
+ def popNext = {
    if(this.enemiesLeft.isEmpty) None
    else {
      var output = this.enemiesLeft.head

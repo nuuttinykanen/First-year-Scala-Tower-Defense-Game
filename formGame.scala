@@ -6,7 +6,7 @@ object formGame {
  var sourceFileText = mutable.Buffer[String]()
 
  var gamePlayer = new Player(100, 300)
- var waves = collection.mutable.Buffer[Int]()
+ var waves: Map[Int, Map[Enemy, Int]] = Map[Int, Map[Enemy, Int]]()
 
  def readFile = {
   try {
@@ -28,7 +28,10 @@ object formGame {
    }
  }
 
- def processData = {
+ def processData: Map[Int, Map[Enemy, Int]] = {
+
+   var returnMap = Map[Int, Map[Enemy, Int]]()
+
    var text: Vector[String] = sourceFileText.mkString.split('#').toVector
 
    text.head.take(6) match {
@@ -37,7 +40,8 @@ object formGame {
    }
 
    for(each <- text.tail) {
-
+     var waveNumbers = collection.mutable.Buffer[Int]()
+     var enemyMap = Map[Enemy, Int]()
      var waveNumber = 1
       var waveNumberString = ""
       var index = 0
@@ -48,9 +52,13 @@ object formGame {
      waveNumber = waveNumberString.toInt
 
      var enemyText = each.drop(4 + waveNumber)
-     var enemyList = collection.mutable.Buffer[Enemy]()
-     waves += waveNumber
+
+     waveNumbers += waveNumber
+     enemyMap = getEnemies(enemyText, enemyMap)
+
+     returnMap += (waveNumber -> enemyMap)
    }
+   returnMap
  }
 
  def formPlayer(data: String): Player = {
@@ -64,14 +72,20 @@ object formGame {
     new Player(startHealth, startMoney)
  }
 
- def getEnemies(enemy: Enemy, data: String) = {
-   var newEnemy: Enemy = new Zombie
-   var amount = data.slice(1, 4).toInt
-   data.take(1) match {
-     case "Z" => newEnemy = new Zombie
-     case "C" => newEnemy = new ZombieCarriage
-     case _   => newEnemy = new Zombie
+ def getEnemies(data: String, map: Map[Enemy, Int]): Map[Enemy, Int] = {
+   var enemyMap = map
+   var newData = data
+   for(each <- newData.grouped(5)) {
+    var newEnemy: Enemy = new Zombie
+    var amount = newData.slice(1, 4).toInt
+    newData.take(1) match {
+      case "Z" => newEnemy = new Zombie
+      case "C" => newEnemy = new ZombieCarriage
+      case _   => newEnemy = new Zombie
+    }
+    newData = newData.drop(3)
+    enemyMap += newEnemy -> amount
    }
+  enemyMap
  }
-
 }
