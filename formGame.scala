@@ -51,7 +51,7 @@ object formGame {
       }
      waveNumber = waveNumberString.toInt
 
-     var enemyText = each.drop(4 + waveNumber)
+     var enemyText = each.drop(4 + waveNumber.toString.length)
 
      waveNumbers += waveNumber
      enemyMap = getEnemies(enemyText, enemyMap)
@@ -73,19 +73,42 @@ object formGame {
  }
 
  def getEnemies(data: String, map: Map[Enemy, Int]): Map[Enemy, Int] = {
+
+   def divideIntoGroups(data: String) = {
+     var enemyGroups = collection.mutable.Buffer[String]()
+     var info = data
+     var counter = 0
+     for(i <- 0 until data.length) {
+       if(data(i).isDigit) {
+         counter += 1
+       }
+       else {
+         enemyGroups += info.take(counter)
+         info = info.drop(counter)
+         counter = 0
+       }
+     }
+     enemyGroups
+   }
+
    var enemyMap = map
-   var newData = data
-   for(each <- newData.grouped(5)) {
-    var newEnemy: Enemy = new Zombie
-    var amount = newData.slice(1, 4).toInt
-    newData.take(1) match {
-      case "Z" => newEnemy = new Zombie
-      case "C" => newEnemy = new ZombieCarriage
-      case _   => newEnemy = new Zombie
-    }
-    newData = newData.drop(3)
-    enemyMap += newEnemy -> amount
+   var newEnemy: Enemy = new Zombie
+   for(each <- divideIntoGroups(data)) {
+
+     var amount = each.tail.toInt
+     each.take(1) match {
+       case "Z" => newEnemy = new Zombie
+       case "C" => newEnemy = new ZombieCarriage
+       case "M" => newEnemy = new MichaelMyers
+       case _   => newEnemy = new Zombie
+     }
+     enemyMap += newEnemy -> amount
    }
   enemyMap
  }
+
+ def formMap(map: LevelMap) = {
+   map.
+ }
+
 }

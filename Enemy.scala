@@ -29,5 +29,8 @@ class ZombieCarriage extends Enemy(20, 10, 10, new Status, Vector[Status](), Vec
  def move() = changeHealth(30)()
 }
 
+class MichaelMyers extends Enemy(20, 10, 10, new Status, Vector[Status](), Vector[Enemy](new Zombie, new Zombie, new Zombie)) {
+ def move() = changeHealth(70)
+}
 
 
