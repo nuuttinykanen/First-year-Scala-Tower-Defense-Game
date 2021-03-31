@@ -5,24 +5,42 @@ class Player(health: Int, money: Int) {
 
  private var currentHealth = health
  private var currentMoney = money
- private var currentTowers = Buffer[Tower]()
+ private var currentRecruits = Buffer[Recruit]()
 
  def getHealth: Int = currentHealth
  def getMoney: Int = currentMoney
- def getTowers: Buffer[Tower] = currentTowers
+ def getRecruits: Buffer[Recruit] = currentRecruits
+
+ def changeHealth(amount: Int)() = {
+   currentHealth += amount
+ }
+
+ def changeMoney(amount: Int)() = {
+   currentMoney += amount
+ }
 
 
- def affordableTowers(pool: TowerStore): Vector[Tower] = {
-    def compareCost(tower: Tower, list: Buffer[Tower]) = if(tower.getCost < this.getMoney) list += tower
-    var affordable = Buffer[Tower]()
-    pool.getTowers.foreach(compareCost(_, affordable))
+ def affordableRecruits: Vector[String] = {
+    def compareCost(recruit: Recruit, list: Buffer[String]) = if(recruit.getCost <= this.getMoney) list += recruit.getName
+    var affordable = Buffer[String]()
+    val store = new RecruitStore
+    store.getRecruits.foreach(compareCost(_, affordable))
     affordable.toVector
  }
 
- def buyTower(tower: Tower)() = {
-   val cost = tower.getCost
+ def hireRecruit(recruit: Recruit): String = {
+   if(affordableRecruits.contains(recruit.getName)) {
+     this.currentRecruits += recruit
+     this.changeMoney(-1 * recruit.getCost)()
+     s"You recruited ${recruit.getName} for ${recruit.getCost} coins."
+   }
+   else "You can't afford that recruit."
  }
- def sellTower(tower: Tower)() = ???
+ def sellRecruit(recruit: Recruit)() =  {
+   val returnPrice = recruit.getSellPrice
+ }
 
- def upgradeTower(tower: Tower)() = ???
+ def upgradeRecruit(recruit: Recruit)() = {
+   recruit
+ }
 }

@@ -7,7 +7,9 @@ class Game(player: Player, waves: Vector[Wave]) {
  private var round = 1
  private var wave = if(waves.nonEmpty) this.waves.head
  private var waveList = waves
+ private var gameMap = new LevelMap(200, 200)
 
+ def getMap = gameMap
 
  def startWave() = ???
 
@@ -19,6 +21,12 @@ class Game(player: Player, waves: Vector[Wave]) {
  def endGame() = ???
  def passTime() = ???
  def spawnEnemy(enemy: Enemy) = ???
- def placeTower(map: LevelMap, tower: Tower, x: Double, y: Double) = ???
+
+ private var enemyList = collection.mutable.Buffer[Enemy]()
+ def enemiesPresent = enemyList
+
+ def placeTower(map: LevelMap, tower: Recruit, x: Double, y: Double) = {
+
+ }
 
 }

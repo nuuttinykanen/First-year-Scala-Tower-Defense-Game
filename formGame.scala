@@ -74,27 +74,10 @@ object formGame {
 
  def getEnemies(data: String, map: Map[Enemy, Int]): Map[Enemy, Int] = {
 
-   def divideIntoGroups(data: String) = {
-     var enemyGroups = collection.mutable.Buffer[String]()
-     var info = data
-     var counter = 0
-     for(i <- 0 until data.length) {
-       if(data(i).isDigit) {
-         counter += 1
-       }
-       else {
-         enemyGroups += info.take(counter)
-         info = info.drop(counter)
-         counter = 0
-       }
-     }
-     enemyGroups
-   }
-
    var enemyMap = map
    var newEnemy: Enemy = new Zombie
-   for(each <- divideIntoGroups(data)) {
 
+   for(each <- data.grouped(4)) {
      var amount = each.tail.toInt
      each.take(1) match {
        case "Z" => newEnemy = new Zombie
@@ -107,8 +90,6 @@ object formGame {
   enemyMap
  }
 
- def formMap(map: LevelMap) = {
-   map.
- }
+ def formMap(map: LevelMap) = ???
 
 }

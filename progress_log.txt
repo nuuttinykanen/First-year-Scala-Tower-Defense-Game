@@ -15,3 +15,15 @@ I am currently, in my opinion, behind schedule. This is because of school work a
 I will work on this significantly more in the coming two weeks. I aim to have experience with GUI by the next checkpoint.
 
 Workload: 8 to 10 hours
+
+
+31.3.2021 PROGRESS CHECKPOINT #2
+
+ - Worked on base grid.
+ - Worked on scala.swing GUI
+ - Worked on RecruitStore functionality.
+
+ I am currently behind schedule. I realized how much work the GUI requires, so I will be significantly less ambitious. I'll have to focus on this project
+ for the next two weeks.
+
+ Workload: 10 hours
