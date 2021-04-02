@@ -6,7 +6,7 @@ import scala.swing.event
 
 object TileMap extends SimpleSwingApplication {
 
-  val game = new Game(new Player(200, 200), Vector[Wave]())
+  val game = new Game(new Player(200, 200, new LevelMap(200, 200)), Vector[Wave]())
 
   def top = new MainFrame {
    title = "Night of Horrors"

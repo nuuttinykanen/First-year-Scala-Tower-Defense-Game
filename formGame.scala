@@ -5,7 +5,7 @@ object formGame {
  val sourceFile = "gameInfo.txt"
  var sourceFileText = mutable.Buffer[String]()
 
- var gamePlayer = new Player(100, 300)
+ var gamePlayer = new Player(100, 300, new LevelMap(200, 200))
  var waves: Map[Int, Map[Enemy, Int]] = Map[Int, Map[Enemy, Int]]()
 
  def readFile = {
@@ -69,7 +69,7 @@ object formGame {
       case "HP" => startHealth = stats.slice(2, 6).toInt
       case "MN" => startMoney = stats.slice(2, 6).toInt
     }
-    new Player(startHealth, startMoney)
+    new Player(startHealth, startMoney, new LevelMap(200, 200))
  }
 
  def getEnemies(data: String, map: Map[Enemy, Int]): Map[Enemy, Int] = {

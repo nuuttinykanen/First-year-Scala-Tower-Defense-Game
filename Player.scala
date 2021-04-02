@@ -1,7 +1,7 @@
 import scala.collection.mutable
 import scala.collection.mutable.Buffer
 
-class Player(health: Int, money: Int) {
+class Player(health: Int, money: Int, map: LevelMap) {
 
  private var currentHealth = health
  private var currentMoney = money
@@ -18,7 +18,6 @@ class Player(health: Int, money: Int) {
  def changeMoney(amount: Int)() = {
    currentMoney += amount
  }
-
 
  def affordableRecruits: Vector[String] = {
     def compareCost(recruit: Recruit, list: Buffer[String]) = if(recruit.getCost <= this.getMoney) list += recruit.getName

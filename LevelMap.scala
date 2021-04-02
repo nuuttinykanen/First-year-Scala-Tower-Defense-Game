@@ -1,22 +1,50 @@
 import o1.grid._
-class LevelMap(x: Int, y: Int, game: Game) extends Grid[LevelMapSquare](x, y) {
+import collection.mutable.Buffer
+class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   private val startPosition = (100, 60)
 
   private val endPosition = (0, 20)
 
-  def enemyLocations = game.enemiesPresent.map(_.getLocation)
+  def enemyLocations = {
+    var locationList = Buffer[GridPos]()
+    var filtered = this.allElements.filter(_.isInstanceOf[EnemySquare])
+    filtered.map(_.asInstanceOf[EnemySquare])
+  }
 
+  def placeEnemy(enemy: Enemy, location: GridPos) = ???
 
-  def initializeEnemyPath: Vector[LevelMapSquare] = ???
+  def getRecruitLocations = {
+    this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
+  }
 
-  def enemyPath: Vector[LevelMapSquare] = ???
+  def getRecruits = {
+    getRecruitLocations.map(_.getRecruit)
+  }
 
-  def initialElements = for (y <- 0 until this.height; x <- 0 until this.width) yield new LevelMapSquare(x, y)
+  def placeRecruit(recruit: Recruit, location: GridPos) = {
+    if(this.elementAt(location).isFree && !this.elementAt(location).isEnemyPath) {
+       this.update(location, new RecruitSquare(location.x, location.y, recruit))
+    }
+  }
 
+  def removeRecruit(location: GridPos) = {
+     if(this.elementAt(location).isInstanceOf[RecruitSquare]) {
+        this.update(location, new MapSquare(location.x, location.y))
+     }
+  }
+
+  def initializeEnemyPath: Vector[MapSquare] = ???
+
+  def enemyPath: Vector[MapSquare] = ???
+
+  def initialElements = for (y <- 0 until this.height; x <- 0 until this.width) yield new MapSquare(x, y)
 }
 
-class LevelMapSquare(x: Int, y: Int) extends GridPos(x, y) {
+class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
+
+  def getX = x
+  def getY = y
 
   var enemyPath = false
   var free = true
@@ -26,14 +54,26 @@ class LevelMapSquare(x: Int, y: Int) extends GridPos(x, y) {
   def isFree = free
   def isOccupied = occupied
 
-  def levelNeighbor(direction: CompassDir): LevelMapSquare = {
-     this.neighbor(direction) match {
-       case square: LevelMapSquare => square
-       case _ => new LevelMapSquare(0, 0)
-     }
+  def levelNeighbor(direction: CompassDir): MapSquare = {
+      this.neighbor(direction) match {
+        case square: MapSquare => square
+        case _ => new MapSquare(0, 0)
+      }
   }
+}
 
-  def getEnemy = {
-     if(this.isEnemyPath && this.
-  }
+class RecruitSquare(x: Int, y: Int, recruit: Recruit) extends MapSquare(x, y) {
+
+  free = false
+  occupied = true
+
+  def getRecruit = recruit
+
+}
+
+class EnemySquare(x: Int, y: Int, enemy: Enemy) extends MapSquare(x, y) {
+  free = false
+  occupied = true
+
+  def getEnemy = enemy
 }

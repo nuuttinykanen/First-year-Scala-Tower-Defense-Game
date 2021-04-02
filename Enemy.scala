@@ -3,8 +3,8 @@ import o1.grid.GridPos
 
 abstract class Enemy(health: Int, speed: Int, moneyDrop: Int, status: Status, immunitites: Vector[Status], enemiesInside: Vector[Enemy]) {
 
-private var currentLocation: LevelMapSquare = new LevelMapSquare(0, 0)
-private var pastLocation = new LevelMapSquare(0, 0)
+private var currentLocation: MapSquare = new MapSquare(0, 0)
+private var pastLocation = new MapSquare(0, 0)
 
 def getLocation = currentLocation
 def changeLocation(newLoc: GridPos) = currentLocation
@@ -14,7 +14,7 @@ def move() = {
    val dirs = Vector(North, East, South, West)
    var current = this.currentLocation
    var next = {
-     var list = collection.mutable.Buffer[LevelMapSquare]()
+     var list = collection.mutable.Buffer[MapSquare]()
      for(each <- dirs) {
        val neighbor = currentLocation.levelNeighbor(each)
        if(neighbor.isEnemyPath && neighbor != pastLocation) {
@@ -30,7 +30,7 @@ def reverseMove() = {
    val dirs = Vector(North, East, South, West)
    var current = this.currentLocation
    var next = {
-     var list = collection.mutable.Buffer[LevelMapSquare]()
+     var list = collection.mutable.Buffer[MapSquare]()
      for(each <- dirs) {
        val neighbor = currentLocation.levelNeighbor(each)
        if(neighbor.isEnemyPath && neighbor == pastLocation) {

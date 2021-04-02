@@ -1,7 +1,7 @@
 import o1.grid._
 import collection.mutable.Buffer
 
-abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap, location: GridPos, game: Game) {
+abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap, location: GridPos) {
 
   def getName = this.name
 
@@ -11,18 +11,12 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   def getSellPrice = sellPrice
   def getCost = cost
 
-  def recursiveSquareScan(range: Int) = {
-    if(range == 1) this.map.neighbors(this.currentLocation, true)
-
-  }
-
   def enemiesInRange: Vector[Enemy] = {
-
     var enemyList = Buffer[Enemy]()
 
     def getEnemy(location: GridPos): Unit = {
        if(this.map.enemyLocations.contains(location)) {
-          enemyList += Some(this.game.enemiesPresent.filter(_.getLocation == location).head)
+          this.map.enemyLocations.filter(_.getX == location.x).filter(_.getY == location.y).head
        }
     }
 
@@ -32,14 +26,13 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
          this.map.neighbors(location, true).foreach(scanRange(range - 1, _))
       }
     }
-
     enemyList.toVector
   }
 
   def attack() = ???
 }
 
-class WhipMan(map: LevelMap, location: GridPos) extends Recruit("Belmont", "", 20, 200, map, location) {
+class WhipMan(map: LevelMap, location: GridPos, game: Game) extends Recruit("Belmont", "", 20, 200, map, location) {
 
 
 }
