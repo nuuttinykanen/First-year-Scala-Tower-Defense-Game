@@ -7,6 +7,7 @@ class LevelMap(x: Int, y: Int, game: Game) extends Grid[LevelMapSquare](x, y) {
 
   def enemyLocations = game.enemiesPresent.map(_.getLocation)
 
+
   def initializeEnemyPath: Vector[LevelMapSquare] = ???
 
   def enemyPath: Vector[LevelMapSquare] = ???
@@ -30,5 +31,9 @@ class LevelMapSquare(x: Int, y: Int) extends GridPos(x, y) {
        case square: LevelMapSquare => square
        case _ => new LevelMapSquare(0, 0)
      }
+  }
+
+  def getEnemy = {
+     if(this.isEnemyPath && this.
   }
 }

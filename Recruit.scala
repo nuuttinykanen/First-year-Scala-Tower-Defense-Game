@@ -18,22 +18,21 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
 
   def enemiesInRange: Vector[Enemy] = {
 
-     def getEnemy(location: LevelMapSquare, list: Buffer[Enemy]): Vector[Enemy] = {
-       var newList = list
-       this.game.enemiesPresent.find(_.getLocation == location) match {
-         case Some(e) => newList += e
-         case None =>
-       }
-       newList.toVector
-     }
+    var enemyList = Buffer[Enemy]()
 
-     var enemyList = collection.mutable.Buffer[Enemy]()
-     def scanRange(range: Int) = {
-      if(range == 1) this.map.neighbors(this.currentLocation, true).foreach(getEnemy(_, enemyList))
+    def getEnemy(location: GridPos): Unit = {
+       if(this.map.enemyLocations.contains(location)) {
+          enemyList += Some(this.game.enemiesPresent.filter(_.getLocation == location).head)
+       }
+    }
+
+    def scanRange(range: Int, location: GridPos): Unit = {
+      if(range == 1) this.map.neighbors(location, true).foreach(getEnemy(_))
       else {
-       this.map.neighbors(this.currentLocation, true).foreach(scanRange(range -1))
+         this.map.neighbors(location, true).foreach(scanRange(range - 1, _))
       }
-     }
+    }
+
     enemyList.toVector
   }
 
