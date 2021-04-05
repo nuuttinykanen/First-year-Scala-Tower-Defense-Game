@@ -101,7 +101,7 @@ object formGame {
       for(each <- 6 to 50) {
          returnList += new GridPos(each, 50)
       }
-      for(each <- 50 to 200) {
+      for(each <- 50 to 199) {
          returnList += new GridPos(50, each)
       }
      returnList.toVector

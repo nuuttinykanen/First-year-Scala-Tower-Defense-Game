@@ -40,7 +40,11 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
      }
   }
 
-  def initializeEnemyPath: Vector[MapSquare] = ???
+  def initializeEnemyPath(vector: Vector[GridPos]) = {
+     for(each <- vector) {
+       this.update(each, new EnemyPathSquare(each.x, each.y))
+     }
+  }
 
   def enemyPath: Vector[MapSquare] = ???
 
