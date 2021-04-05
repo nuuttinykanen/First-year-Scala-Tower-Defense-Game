@@ -3,33 +3,39 @@ import collection.mutable.Buffer
 class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   private val startPosition = (100, 60)
-
   private val endPosition = (0, 20)
 
-  def enemyLocations = {
+  def getEnemySquares = {
     var locationList = Buffer[GridPos]()
     var filtered = this.allElements.filter(_.isInstanceOf[EnemySquare])
     filtered.map(_.asInstanceOf[EnemySquare])
   }
 
-  def placeEnemy(enemy: Enemy, location: GridPos) = ???
+  def getRecruitSquares = this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
 
-  def getRecruitLocations = {
-    this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
-  }
-
-  def getRecruits = {
-    getRecruitLocations.map(_.getRecruit)
-  }
+  def getRecruits = getRecruitSquares.map(_.getRecruit)
 
   def placeRecruit(recruit: Recruit, location: GridPos) = {
-    if(this.elementAt(location).isFree && !this.elementAt(location).isEnemyPath) {
+    if(this.elementAt(location).isFree && this.elementAt(location).isInstanceOf[MapSquare]) {
        this.update(location, new RecruitSquare(location.x, location.y, recruit))
+       recruit.setLocation(this.elementAt(location).asInstanceOf[RecruitSquare])
     }
   }
 
   def removeRecruit(location: GridPos) = {
      if(this.elementAt(location).isInstanceOf[RecruitSquare]) {
+        this.update(location, new MapSquare(location.x, location.y))
+     }
+  }
+
+  def placeEnemy(enemy: Enemy, location: GridPos) = {
+    if(this.elementAt(location).isInstanceOf[EnemyPathSquare] && !this.elementAt(location).isOccupied) {
+       this.update(location, new EnemySquare(location.x, location.y, enemy))
+    }
+  }
+
+  def removeEnemy(location: GridPos) = {
+     if(this.elementAt(location).isInstanceOf[EnemyPathSquare]) {
         this.update(location, new MapSquare(location.x, location.y))
      }
   }
@@ -45,6 +51,7 @@ class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
 
   def getX = x
   def getY = y
+  def getGridPos = new GridPos(x, y)
 
   var enemyPath = false
   var free = true
@@ -53,6 +60,7 @@ class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
   def isEnemyPath = enemyPath
   def isFree = free
   def isOccupied = occupied
+
 
   def levelNeighbor(direction: CompassDir): MapSquare = {
       this.neighbor(direction) match {
@@ -63,7 +71,6 @@ class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
 }
 
 class RecruitSquare(x: Int, y: Int, recruit: Recruit) extends MapSquare(x, y) {
-
   free = false
   occupied = true
 
@@ -71,9 +78,13 @@ class RecruitSquare(x: Int, y: Int, recruit: Recruit) extends MapSquare(x, y) {
 
 }
 
-class EnemySquare(x: Int, y: Int, enemy: Enemy) extends MapSquare(x, y) {
+class EnemyPathSquare(x: Int, y: Int) extends MapSquare(x, y) {
   free = false
-  occupied = true
+  occupied = false
 
+}
+
+class EnemySquare(x: Int, y: Int, enemy: Enemy) extends EnemyPathSquare(x, y) {
+  occupied = true
   def getEnemy = enemy
 }

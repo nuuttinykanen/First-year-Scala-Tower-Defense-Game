@@ -1,11 +1,13 @@
 import o1.grid._
 import collection.mutable.Buffer
 
-abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap, location: GridPos) {
+abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap) {
 
   def getName = this.name
 
-  private var currentLocation = location
+  def setLocation(square: RecruitSquare) = currentLocation = square
+
+  private var currentLocation = new RecruitSquare(0, 0, this)
   private var sellPrice = (cost / 8) * 5
 
   def getSellPrice = sellPrice
@@ -14,25 +16,19 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   def enemiesInRange: Vector[Enemy] = {
     var enemyList = Buffer[Enemy]()
 
-    def getEnemy(location: GridPos): Unit = {
-       if(this.map.enemyLocations.contains(location)) {
-          this.map.enemyLocations.filter(_.getX == location.x).filter(_.getY == location.y).head
-       }
+    def scanRange(location: RecruitSquare) = {
+      val list = this.map.getEnemySquares.filter(_.distance(location) <= this.range)
+      list.foreach(enemyList += _.getEnemy)
     }
 
-    def scanRange(range: Int, location: GridPos): Unit = {
-      if(range == 1) this.map.neighbors(location, true).foreach(getEnemy(_))
-      else {
-         this.map.neighbors(location, true).foreach(scanRange(range - 1, _))
-      }
-    }
+    scanRange(this.currentLocation)
     enemyList.toVector
   }
 
   def attack() = ???
 }
 
-class WhipMan(map: LevelMap, location: GridPos, game: Game) extends Recruit("Belmont", "", 20, 200, map, location) {
+class WhipMan(map: LevelMap, game: Game) extends Recruit("Belmont", "", 3, 200, map) {
 
 
 }

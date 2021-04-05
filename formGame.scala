@@ -1,5 +1,6 @@
 import java.io.{BufferedReader, FileNotFoundException, FileReader, IOException}
 import scala.collection.mutable
+import o1.grid._
 
 object formGame {
  val sourceFile = "gameInfo.txt"
@@ -90,6 +91,22 @@ object formGame {
   enemyMap
  }
 
- def formMap(map: LevelMap) = ???
+ def formMap(map: LevelMap) = {
+   val gridPosVector = {
+
+      var returnList = mutable.Buffer[GridPos]()
+      for(each <- 0 to 50) {
+         returnList += new GridPos(5, each)
+      }
+      for(each <- 6 to 50) {
+         returnList += new GridPos(each, 50)
+      }
+      for(each <- 50 to 200) {
+         returnList += new GridPos(50, each)
+      }
+     returnList.toVector
+   }
+   map.initializeEnemyPath(gridPosVector)
+ }
 
 }
