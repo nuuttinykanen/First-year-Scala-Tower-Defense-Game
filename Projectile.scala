@@ -20,7 +20,7 @@ class Projectile(strength: Int, target: Enemy, square: MapSquare, map: LevelMap)
   }
 
   def move() = {
-  if(this.currentLocation.distance(getTargetLocation) == 1) None
+   if(this.currentLocation.distance(getTargetLocation) == 1) None
     else {
     if(abs(this.currentLocation.xDiff(getTargetLocation)) >= abs(this.currentLocation.yDiff(getTargetLocation))) {
        this.currentLocation.xDirectionOf(getTargetLocation) match {

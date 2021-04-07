@@ -2,6 +2,10 @@ import o1.grid._
 
 object test extends App {
 
+  def onTick() = {
+
+  }
+
   val map = new LevelMap(200, 200)
   val player = new Player(200, 100, map)
   val game = new Game(player, Vector[Wave](new Wave(Map(new Zombie -> 20))))
@@ -38,4 +42,13 @@ object test extends App {
   println(s"${map.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
   println(s"${map.enemyTravelPath}")
   println("END")
+
+  import java.util.concurrent._
+
+  val ex = new ScheduledThreadPoolExecutor(1)
+  val task = new Runnable {
+   def run() = println("Beep!")
+  }
+  val f = ex.scheduleAtFixedRate(task, 1, 2, TimeUnit.MILLISECONDS)
+  f
 }
