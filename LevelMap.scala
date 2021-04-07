@@ -5,6 +5,16 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   private val startPosition = (100, 60)
   private val endPosition = (0, 20)
 
+  var enemyTravelPath = Buffer[GridPos]()
+
+  private var projectiles = Buffer[Projectile]()
+
+  def addProjectile(projectile: Projectile) = projectiles += projectile
+
+  def removeProjectile(projectile: Projectile) = {
+    if(this.projectiles.contains(projectile)) projectiles -= projectile
+  }
+
   def getEnemySquares = {
     var locationList = Buffer[GridPos]()
     var filtered = this.allElements.filter(_.isInstanceOf[EnemySquare])
@@ -43,6 +53,7 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   def initializeEnemyPath(vector: Vector[GridPos]) = {
      for(each <- vector) {
        this.update(each, new EnemyPathSquare(each.x, each.y))
+       enemyTravelPath += this.elementAt(new GridPos(each.x, each.y))
      }
   }
 

@@ -26,7 +26,7 @@ object test extends App {
 
   var simon = new Simon(map)
   map.placeRecruit(simon, new GridPos(0, 20))
-  map.placeRecruit(new Simon(map), new GridPos(1, 14))
+  map.placeRecruit(new Simon(map), new GridPos(6, 40))
   println(s"${map.getRecruitSquares}")
   println(s"${map.getRecruits}")
 
@@ -35,5 +35,7 @@ object test extends App {
 
   println("Enemies in range:")
   println(s"${simon.enemiesInRange}")
+  println(s"${map.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
+  println(s"${map.enemyTravelPath}")
   println("END")
 }

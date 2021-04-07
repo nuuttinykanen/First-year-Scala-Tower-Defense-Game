@@ -25,7 +25,11 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
     enemyList.toVector
   }
 
-  def attack() = ???
+  def attack() = {
+     if(this.enemiesInRange.nonEmpty) {
+
+     }
+  }
 }
 
 class WhipMan(map: LevelMap, game: Game) extends Recruit("Belmont", "", 3, 200, map) {
