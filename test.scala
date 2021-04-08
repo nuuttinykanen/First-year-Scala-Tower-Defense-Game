@@ -41,13 +41,19 @@ object test extends App {
   println(s"${simon.enemiesInRange}")
   println(s"${map.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
   println(s"${map.enemyTravelPath}")
-  println("END")
+  println("\n")
+
+  println("Playing with waves:")
+  println(s"${game.getWaveList}")
+  println(s"${game.getWave}")
+  game.spawnEnemy()
+  println(s"${game.getWave}")
 
   import java.util.concurrent._
 
   val ex = new ScheduledThreadPoolExecutor(1)
   val task = new Runnable {
-   def run() = println("Beep!")
+   def run() = game.passTime()
   }
   val f = ex.scheduleAtFixedRate(task, 1, 2, TimeUnit.MILLISECONDS)
   f

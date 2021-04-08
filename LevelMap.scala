@@ -21,6 +21,8 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     filtered.map(_.asInstanceOf[EnemySquare])
   }
 
+  def getEnemySpawn = enemyTravelPath.head
+
   def getRecruitSquares = this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
 
   def getRecruits = getRecruitSquares.map(_.getRecruit)

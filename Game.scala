@@ -7,29 +7,35 @@ import o1.View
 class Game(player: Player, waves: Vector[Wave]) {
 
  private var round = 1
- private var wave = if(waves.nonEmpty) this.waves.head
+ private var wave: Wave = this.waves.head
  private var waveList = waves
  private var gameMap = new LevelMap(200, 200)
 
  def getMap = gameMap
+ def getWave = wave
+ def getWaveList = waveList
 
  def startWave() = ???
 
  def endWave() = {
    waveList = waveList.drop(1)
-   if(waveList.isEmpty) endGame()
+   if(waveList.nonEmpty) wave = this.waves.head
+   else endGame()
  }
-
- val t = new java.util.Timer()
- val task = new java.util.TimerTask {
-   def run() = passTime()
- }
- t.schedule(task, 1000L, 1000L)
- task.cancel()
 
  def endGame() = ???
- def passTime() = ???
- def spawnEnemy(enemy: Enemy) = ???
+
+ def passTime() = {
+   gameMap.getRecruits.foreach(_.attack())
+   spawnEnemy()
+ }
+
+ def spawnEnemy() = {
+   val spawn = this.wave.popNext
+   if(spawn.isDefined) {
+      this.gameMap.placeEnemy(spawn.get, this.gameMap.getEnemySpawn)
+   }
+ }
 
  private var enemyList = collection.mutable.Buffer[Enemy]()
  def enemiesPresent = enemyList
