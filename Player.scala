@@ -3,6 +3,8 @@ import scala.collection.mutable.Buffer
 
 class Player(health: Int, money: Int, map: LevelMap) {
 
+ def getMap = map
+
  private var currentHealth = health
  private var currentMoney = money
  private var currentRecruits = Buffer[Recruit]()

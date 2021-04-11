@@ -9,8 +9,12 @@ class Wave(enemyMap: Map[Enemy, Int]) {
 
  private var enemiesLeft: Map[Enemy, Int] = enemyMap
 
+ def enemyOnTop = {
+   if(enemyList.nonEmpty) enemyList.head._1
+ }
+
  def removeEnemy(enemy: Enemy) = {
-   if(enemyList.contains(enemy)) {
+   if(enemyList.keys.exists(_ == enemy)) {
       val key = enemyList.keys.find(_ == enemy).get
       val value = enemyList(key)
       // modify

@@ -4,7 +4,7 @@ import o1.grid.GridPos
 abstract class Enemy(health: Int, speed: Int, moneyDrop: Int, status: Status, immunitites: Vector[Status], enemiesInside: Vector[Enemy]) {
 
 private var currentLocation: MapSquare = new MapSquare(0, 0)
-private var pastLocation = new MapSquare(0, 0)
+private var pastLocation: Option[MapSquare] = None
 
 def getLocation = currentLocation
 def changeLocation(newLoc: GridPos) = currentLocation

@@ -9,6 +9,8 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   private var projectiles = Buffer[Projectile]()
 
+  def getProjectiles = projectiles
+
   def addProjectile(projectile: Projectile) = projectiles += projectile
 
   def removeProjectile(projectile: Projectile) = {
@@ -21,7 +23,22 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     filtered.map(_.asInstanceOf[EnemySquare])
   }
 
-  def getEnemySpawn = enemyTravelPath.head
+  def getEnemySpawn = {
+    if(enemyTravelPath.nonEmpty) enemyTravelPath.head
+    else GridPos(0, 0)
+  }
+
+  def moveEnemies() = {
+    val enemyLocList = enemyTravelPath.filter(this.elementAt(_).isInstanceOf[EnemySquare]).toVector
+    val enemyList = enemyLocList.map(this.elementAt(_).asInstanceOf[EnemySquare].getEnemy)
+    val nowIndexList = enemyLocList.map(enemyTravelPath.indexOf(_))
+    val futureIndexList = nowIndexList.map(_ + 1)
+    val zipped = enemyLocList.zip(nowIndexList).zip(enemyList)
+    zipped.foreach(n => this.update(enemyTravelPath(n._1._2 + 1), new EnemySquare(enemyTravelPath(n._1._2 + 1).x, enemyTravelPath(n._1._2 + 1).y, n._2)))
+    zipped.foreach(n => this.update(enemyTravelPath(n._1._2), new EnemyPathSquare(n._1._1.x, n._1._1.y)))
+  }
+
+  def removeAllEnemies() = this.getEnemySquares.foreach(n => this.removeEnemy(GridPos(n.x, n.y)))
 
   def getRecruitSquares = this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
 

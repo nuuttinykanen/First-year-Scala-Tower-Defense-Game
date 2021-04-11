@@ -6,23 +6,17 @@ object test extends App {
 
   }
 
-  val map = new LevelMap(200, 200)
-  val player = new Player(200, 100, map)
-  val game = new Game(player, Vector[Wave](new Wave(Map(new Zombie -> 20))))
-
-  def testLoadGame() = {
-    formGame.readFile
-    formGame.formMap(map)
-  }
-
-  testLoadGame()
+  formGame.readFile
 
   println(s"What I got from file: ${formGame.sourceFileText}")
   println(s"Here it is as mkString: ${formGame.sourceFileText.mkString}")
   println(s"Here it is separated: ${formGame.sourceFileText.mkString.split('#').mkString(", ")}")
   println(s"Here it is as a vector: ${formGame.sourceFileText.mkString.split('#').toVector}")
 
-  println(s"${formGame.processData}")
+  val game = formGame.processData
+  val player = game.getPlayer
+  val map = game.getMap
+  formGame.formMap(map)
 
   println(s"${player.affordableRecruits}")
   player.hireRecruit(new Simon(map))
@@ -41,20 +35,33 @@ object test extends App {
   println(s"${simon.enemiesInRange}")
   println(s"${map.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
   println(s"${map.enemyTravelPath}")
-  println("\n")
 
-  println("Playing with waves:")
-  println(s"${game.getWaveList}")
-  println(s"${game.getWave}")
-  game.spawnEnemy()
-  println(s"${game.getWave}")
+  println("\nPlaying with waves:")
+  println(s"All waves: ${game.getWaveList}")
+  println(s"Here is the wave: ${game.getWave}")
+  println(s"Wave enemy list: ${game.getWave.enemyList}")
+  println(s"Wave enemy on top: ${game.getWave.enemyOnTop}")
 
-  import java.util.concurrent._
+  map.removeAllEnemies()
+  println("Let's pass the time! \n Here is the situation now:")
+  println(s"Enemies present: ${map.getEnemySquares.map(_.getEnemy)}")
 
-  val ex = new ScheduledThreadPoolExecutor(1)
-  val task = new Runnable {
-   def run() = game.passTime()
-  }
-  val f = ex.scheduleAtFixedRate(task, 1, 2, TimeUnit.MILLISECONDS)
-  f
+  map.placeRecruit(new Simon(map), new GridPos(4, 1))
+  game.passTime()
+  println(s"Enemies present: ${map.getEnemySquares.map(_.getEnemy)}")
+  println(s"Their locations: ${map.getEnemySquares.map(_.x).zip(map.getEnemySquares.map(_.y))}")
+  game.passTime()
+  println("After two:")
+  println(s"Enemies present: ${map.getEnemySquares.map(_.getEnemy)}")
+  println(s"Their locations: ${map.getEnemySquares.map(_.x).zip(map.getEnemySquares.map(_.y))}")
+  println(s"Projectiles: ${map.getProjectiles}")
+  game.passTime()
+  println(s"Enemies present: ${map.getEnemySquares.map(_.getEnemy)}")
+  println(s"Their locations: ${map.getEnemySquares.map(_.x).zip(map.getEnemySquares.map(_.y))}")
+  game.passTime()
+  println(s"Projectiles: ${map.getProjectiles}")
+  println(s"Enemies present: ${map.getEnemySquares.map(_.getEnemy)}")
+  println(s"Their locations: ${map.getEnemySquares.map(_.x).zip(map.getEnemySquares.map(_.y))}")
+  println(s"Wave list: ${game.getWave.enemyList.mkString}")
+  println(s"${map.getEnemySquares.map(_.getEnemy).map(_.getHealth)}")
 }

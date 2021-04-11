@@ -7,7 +7,7 @@ object formGame {
  var sourceFileText = mutable.Buffer[String]()
 
  var gamePlayer = new Player(100, 300, new LevelMap(200, 200))
- var waves: Map[Int, Map[Enemy, Int]] = Map[Int, Map[Enemy, Int]]()
+ var waves: Option[Map[Int, Wave]] = None
 
  def readFile = {
   try {
@@ -29,7 +29,7 @@ object formGame {
    }
  }
 
- def processData: Map[Int, Map[Enemy, Int]] = {
+ def processData: Game = {
 
    var returnMap = Map[Int, Map[Enemy, Int]]()
 
@@ -59,7 +59,9 @@ object formGame {
 
      returnMap += (waveNumber -> enemyMap)
    }
-   returnMap
+   val waveList = returnMap.map(n => new Wave(n._2)).toVector
+
+   new Game(gamePlayer, waveList)
  }
 
  def formPlayer(data: String): Player = {
@@ -93,20 +95,15 @@ object formGame {
 
  def formMap(map: LevelMap) = {
    val gridPosVector = {
-
       var returnList = mutable.Buffer[GridPos]()
-      for(each <- 0 to 50) {
-         returnList += new GridPos(5, each)
-      }
-      for(each <- 6 to 50) {
-         returnList += new GridPos(each, 50)
-      }
-      for(each <- 50 to 199) {
-         returnList += new GridPos(50, each)
-      }
+      for(each <- 0  to  50) returnList += new GridPos(5, each)
+      for(each <- 6  to  50) returnList += new GridPos(each, 50)
+      for(each <- 50 to 199) returnList += new GridPos(50, each)
      returnList.toVector
    }
    map.initializeEnemyPath(gridPosVector)
  }
+
+ val gameMap = new LevelMap(200, 200)
 
 }
