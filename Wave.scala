@@ -5,9 +5,7 @@ class Wave(enemyMap: Map[Enemy, Int]) {
  private def amount = enemyMap.keys.size
  private var generator = new Random(amount)
 
- var enemyList = enemyMap
-
- private var enemiesLeft: Map[Enemy, Int] = enemyMap
+ private var enemyList = enemyMap
 
  def enemyOnTop = {
    if(enemyList.nonEmpty) enemyList.head._1
@@ -23,10 +21,14 @@ class Wave(enemyMap: Map[Enemy, Int]) {
    }
  }
 
+ def getEnemyList = enemyList
+
+ def enemyListEmpty = enemyList.isEmpty
+
  def popNext = {
-   if(this.enemiesLeft.isEmpty) None
+   if(this.enemyList.isEmpty) None
    else {
-     val output = this.enemiesLeft.head._1
+     val output = this.enemyList.head._1
      this.removeEnemy(output)
      Some(output)
    }

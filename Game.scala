@@ -33,9 +33,8 @@ class Game(player: Player, waves: Vector[Wave]) {
  }
 
  def spawnEnemy() = {
-   val spawn = this.wave.popNext
-   if(spawn.isDefined && this.gameMap.elementAt(gameMap.getEnemySpawn).isInstanceOf[EnemyPathSquare]) {
-      this.gameMap.placeEnemy(spawn.get, this.gameMap.getEnemySpawn)
+   if(!this.wave.enemyListEmpty && this.gameMap.elementAt(gameMap.getEnemySpawn).isInstanceOf[EnemyPathSquare]) {
+      this.gameMap.placeEnemy(this.wave.popNext.get, this.gameMap.getEnemySpawn)
    }
  }
 
