@@ -29,8 +29,9 @@ class Player(health: Int, money: Int, map: LevelMap) {
     affordable.toVector
  }
 
- def hireRecruit(recruit: Recruit): String = {
-   if(affordableRecruits.contains(recruit.getName)) {
+ def hireRecruit(recruit: Recruit, square: MapSquare): String = {
+   if(affordableRecruits.contains(recruit.getName) && square.isFree && !square.isOccupied) {
+     this.getMap.placeRecruit(recruit, square)
      this.currentRecruits += recruit
      this.changeMoney(-1 * recruit.getCost)()
      s"You recruited ${recruit.getName} for ${recruit.getCost} coins."

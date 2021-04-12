@@ -20,7 +20,7 @@ class Game(player: Player, waves: Vector[Wave]) {
 
  def endWave() = {
    waveList = waveList.drop(1)
-   if(waveList.nonEmpty) wave = this.waves.head
+   if(waveList.nonEmpty) wave = this.waveList.head
    else endGame()
  }
 
@@ -29,7 +29,8 @@ class Game(player: Player, waves: Vector[Wave]) {
  def passTime() = {
    gameMap.getRecruits.foreach(_.attack())
    this.gameMap.moveEnemies()
-   spawnEnemy()
+   if(!wave.enemyListEmpty) spawnEnemy()
+   else endWave()
  }
 
  def spawnEnemy() = {

@@ -4,6 +4,6 @@ abstract class AttackRecruit(name: String, description: String, range: Int, cost
 
 }
 
-class Simon(map: LevelMap) extends AttackRecruit("Simon Belmont", "", 20, 100, map) {
+class Simon(map: LevelMap) extends AttackRecruit("Simon Belmont", "", 20, 1, map) {
 }
 

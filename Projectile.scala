@@ -5,7 +5,7 @@ class Projectile(strength: Int, target: Enemy, square: MapSquare, map: LevelMap)
   private var currentLocation = square
   def getLocation = currentLocation
 
-  def getTargetLocation = target.getLocation
+  def getTargetLocation = map.getEnemySquares.find(_.getEnemy == target)
 
   def act() = {
     if(this.currentLocation == target.getLocation) {
@@ -20,16 +20,16 @@ class Projectile(strength: Int, target: Enemy, square: MapSquare, map: LevelMap)
   }
 
   def move() = {
-   if(this.currentLocation.distance(getTargetLocation) == 1) None
+   if(this.currentLocation.distance(getTargetLocation.get) == 1) None
     else {
-    if(abs(this.currentLocation.xDiff(getTargetLocation)) >= abs(this.currentLocation.yDiff(getTargetLocation))) {
-       this.currentLocation.xDirectionOf(getTargetLocation) match {
+    if(abs(this.currentLocation.xDiff(getTargetLocation.get)) >= abs(this.currentLocation.yDiff(getTargetLocation.get))) {
+       this.currentLocation.xDirectionOf(getTargetLocation.get) match {
          case Some(way) => this.currentLocation = this.currentLocation.levelNeighbor(way)
          case None =>
        }
     }
     else {
-       this.currentLocation.yDirectionOf(getTargetLocation) match {
+       this.currentLocation.yDirectionOf(getTargetLocation.get) match {
          case Some(way) => this.currentLocation = this.currentLocation.levelNeighbor(way)
          case None =>
        }

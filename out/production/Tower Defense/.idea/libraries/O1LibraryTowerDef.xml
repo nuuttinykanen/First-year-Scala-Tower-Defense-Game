@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="O1LibraryTowerDef">
+    <ANNOTATIONS>
+      <root url="file://$PROJECT_DIR$/../O1Library" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../O1Library" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/../O1Library" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/../O1Library" />
+    </NATIVE>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../O1Library" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../O1Library" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../O1Library" recursive="false" type="SOURCES" />
+  </library>
+</component>
