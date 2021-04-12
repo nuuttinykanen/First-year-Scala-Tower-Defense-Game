@@ -40,6 +40,7 @@ class Player(health: Int, money: Int, map: LevelMap) {
  }
  def sellRecruit(recruit: Recruit)() =  {
    val returnPrice = recruit.getSellPrice
+   this.changeMoney(returnPrice)
  }
 
  def upgradeRecruit(recruit: Recruit)() = {

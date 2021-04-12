@@ -8,7 +8,7 @@ class Projectile(strength: Int, target: Enemy, square: MapSquare, map: LevelMap)
   def getTargetLocation = map.getEnemySquares.find(_.getEnemy == target)
 
   def act() = {
-    if(this.currentLocation == target.getLocation) {
+    if(this.currentLocation.distance(target.getLocation) < 1) {
       hit()
     }
     else move()

@@ -28,8 +28,14 @@ class Wave(enemyMap: Map[Enemy, Int]) {
  def popNext = {
    if(this.enemyList.isEmpty) None
    else {
-     val output = this.enemyList.head._1
+     var output = this.enemyList.head._1
      this.removeEnemy(output)
+     output match {
+       case some: Zombie => output = new Zombie
+       case some: ZombieCarriage => output = new ZombieCarriage
+       case some: MichaelMyers =>  output = new MichaelMyers
+       case _ => output = new Zombie
+     }
      Some(output)
    }
  }

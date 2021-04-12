@@ -17,6 +17,11 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     if(this.projectiles.contains(projectile)) projectiles -= projectile
   }
 
+  def scanProjectiles() = {
+    val list = this.getProjectiles.filter(_.getTargetLocation.isEmpty)
+    if(list.nonEmpty) list.foreach(this.removeProjectile(_))
+  }
+
   def getEnemySquares = {
     var locationList = Buffer[GridPos]()
     var filtered = this.allElements.filter(_.isInstanceOf[EnemySquare])

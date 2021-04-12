@@ -26,16 +26,26 @@ class Game(player: Player, waves: Vector[Wave]) {
 
  def endGame() = ???
 
+ private var enemyMoveCounter = 0
+
  def passTime() = {
+   gameMap.scanProjectiles()
+   if(gameMap.getProjectiles.nonEmpty && enemyMoveCounter > 10) gameMap.getProjectiles.foreach(_.act())
    gameMap.getRecruits.foreach(_.attack())
-   this.gameMap.moveEnemies()
+
+   if(enemyMoveCounter > 5) {
+      this.gameMap.moveEnemies()
+      enemyMoveCounter = 0
+   }
+   enemyMoveCounter += 1
+
    if(!wave.enemyListEmpty) spawnEnemy()
    else endWave()
  }
 
  def spawnEnemy() = {
    if(!this.wave.enemyListEmpty && this.gameMap.elementAt(gameMap.getEnemySpawn).isInstanceOf[EnemyPathSquare]) {
-      this.gameMap.placeEnemy(this.wave.popNext.get, this.gameMap.getEnemySpawn)
+     this.gameMap.placeEnemy(this.wave.popNext.get, this.gameMap.getEnemySpawn)
    }
  }
 

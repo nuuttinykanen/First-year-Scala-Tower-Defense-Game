@@ -24,15 +24,16 @@ object test extends App {
 
   // START GAME
   game.passTime()
-  println(s"${game.getMap.getProjectiles.map(_.getTargetLocation)}")
   game.passTime()
   game.passTime()
   game.passTime()
   game.passTime()
   game.passTime()
+  println(s"Projectile targets: ${game.getMap.getProjectiles.map(_.getTargetLocation)}")
   game.passTime()
   game.passTime()
 
+  println(s"Enemies in range: ${game.getMap.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
   println(s"The enemy path: ${game.getMap.enemyTravelPath}")
   println(s"List of recruits and their positions: ${game.getMap.getRecruitSquares.map(_.getRecruit).zip(game.getMap.getRecruitSquares.map(_.getGridPos))}\n")
   println(s"List of enemies and their positions: ${game.getMap.getEnemySquares.map(_.getEnemy).zip(game.getMap.getEnemySquares.map(_.getGridPos))}\n")
