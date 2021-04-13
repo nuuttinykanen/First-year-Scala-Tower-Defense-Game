@@ -39,13 +39,13 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
     val spawnLoc: MapSquare = {
         if(abs(this.currentLocation.xDiff(target.getLocation)) >= abs(this.currentLocation.yDiff(target.getLocation))) {
           this.currentLocation.xDirectionOf(target.getLocation) match {
-           case Some(way) => this.currentLocation.levelNeighbor(way)
+           case Some(way) => this.map.squareNeighbor(this.currentLocation, way)
            case None => this.currentLocation
            }
         }
        else {
         this.currentLocation.yDirectionOf(target.getLocation) match {
-          case Some(way) => this.currentLocation.levelNeighbor(way)
+          case Some(way) => this.map.squareNeighbor(this.currentLocation, way)
           case None => this.currentLocation
         }
        }

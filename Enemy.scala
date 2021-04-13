@@ -10,38 +10,6 @@ def getLocation = currentLocation
 def changeLocation(newLoc: GridPos) = currentLocation
 def getPastLocation = pastLocation
 
-def move() = {
-   val dirs = Vector(North, East, South, West)
-   var current = this.currentLocation
-   var next = {
-     var list = collection.mutable.Buffer[MapSquare]()
-     for(each <- dirs) {
-       val neighbor = currentLocation.levelNeighbor(each)
-       if(neighbor.isEnemyPath && neighbor != pastLocation) {
-         list += neighbor
-       }
-     }
-     list.head
-   }
-  this.changeLocation(next)
-}
-
-def reverseMove() = {
-   val dirs = Vector(North, East, South, West)
-   var current = this.currentLocation
-   var next = {
-     var list = collection.mutable.Buffer[MapSquare]()
-     for(each <- dirs) {
-       val neighbor = currentLocation.levelNeighbor(each)
-       if(neighbor.isEnemyPath && neighbor == pastLocation) {
-         list += neighbor
-       }
-     }
-     list.head
-   }
-  this.changeLocation(next)
-}
-
 private var currentHealth = health
 private var currentSpeed  = speed
 private var currentStatus = status

@@ -8,6 +8,8 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   var enemyTravelPath = Buffer[GridPos]()
 
   private var projectiles = Buffer[Projectile]()
+  var graveyard = Buffer[Projectile]()
+  var enemyGraveyard = Buffer[Enemy]()
 
   def getProjectiles = projectiles
 
@@ -15,6 +17,7 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   def removeProjectile(projectile: Projectile) = {
     if(this.projectiles.contains(projectile)) projectiles -= projectile
+    graveyard += projectile
   }
 
   def scanProjectiles() = {
@@ -41,6 +44,11 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     val zipped = enemyLocList.zip(nowIndexList).zip(enemyList)
     zipped.foreach(n => this.update(enemyTravelPath(n._1._2 + 1), new EnemySquare(enemyTravelPath(n._1._2 + 1).x, enemyTravelPath(n._1._2 + 1).y, n._2)))
     zipped.foreach(n => this.update(enemyTravelPath(n._1._2), new EnemyPathSquare(n._1._1.x, n._1._1.y)))
+  }
+
+  def healthCheckRemoval() = {
+     val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
+     if(list.nonEmpty) list.foreach(n => this.removeEnemy(n.getLocation))
   }
 
   def removeAllEnemies() = this.getEnemySquares.foreach(n => this.removeEnemy(GridPos(n.x, n.y)))
@@ -70,6 +78,7 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   def removeEnemy(location: GridPos) = {
      if(this.elementAt(location).isInstanceOf[EnemyPathSquare]) {
+        this.enemyGraveyard += this.elementAt(location).asInstanceOf[EnemySquare].getEnemy
         this.update(location, new MapSquare(location.x, location.y))
      }
   }
@@ -84,6 +93,9 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   def enemyPath: Vector[MapSquare] = ???
 
   def initialElements = for (y <- 0 until this.height; x <- 0 until this.width) yield new MapSquare(x, y)
+
+  def squareNeighbor(square: MapSquare, direction: CompassDir) = this.elementAt(square.neighbor(direction))
+
 }
 
 class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
@@ -99,14 +111,6 @@ class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
   def isEnemyPath = enemyPath
   def isFree = free
   def isOccupied = occupied
-
-
-  def levelNeighbor(direction: CompassDir): MapSquare = {
-      this.neighbor(direction) match {
-        case square: MapSquare => square
-        case _ => new MapSquare(0, 0)
-      }
-  }
 }
 
 class RecruitSquare(x: Int, y: Int, recruit: Recruit) extends MapSquare(x, y) {

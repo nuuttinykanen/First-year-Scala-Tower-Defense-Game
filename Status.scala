@@ -5,7 +5,7 @@ abstract class Status {
 }
 
 class Confused extends Status {
- def effect(enemy: Enemy) = enemy.reverseMove()
+ def effect(enemy: Enemy) = ???
 }
 
 class Slowed extends Status {

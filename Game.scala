@@ -29,14 +29,16 @@ class Game(player: Player, waves: Vector[Wave]) {
  private var enemyMoveCounter = 0
 
  def passTime() = {
+   gameMap.healthCheckRemoval()
    gameMap.scanProjectiles()
-   if(gameMap.getProjectiles.nonEmpty && enemyMoveCounter > 10) gameMap.getProjectiles.foreach(_.act())
+   if(gameMap.getProjectiles.nonEmpty) gameMap.getProjectiles.foreach(_.move())
    gameMap.getRecruits.foreach(_.attack())
 
-   if(enemyMoveCounter > 5) {
+   if(enemyMoveCounter > 2) {
       this.gameMap.moveEnemies()
       enemyMoveCounter = 0
    }
+
    enemyMoveCounter += 1
 
    if(!wave.enemyListEmpty) spawnEnemy()
