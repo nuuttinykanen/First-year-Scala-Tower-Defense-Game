@@ -9,6 +9,9 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   private val endPosition = (0, 20)
 
   var enemyTravelPath = Buffer[GridPos]()
+  private var penaltyHealth: Option[Int] = None
+  def getPenaltyHealth = this.penaltyHealth
+
 
   private var projectiles = Buffer[Projectile]()
 
@@ -36,7 +39,18 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     else GridPos(0, 0)
   }
 
+  def getLastSquare = this.elementAt(this.enemyTravelPath.last)
+
+  def checkLastSquare() = {
+    if(this.elementAt(getLastSquare).isInstanceOf[EnemySquare]) {
+       this.removeEnemy(getLastSquare)
+       this.penaltyHealth = Some(getLastSquare.asInstanceOf[EnemySquare].getEnemy.getAttack)
+    }
+  }
+
   def moveEnemies() = {
+    if(this.penaltyHealth.isDefined) this.penaltyHealth = None
+    checkLastSquare()
     val enemyLocList = enemyTravelPath.filter(this.elementAt(_).isInstanceOf[EnemySquare]).toVector
     val enemyList = enemyLocList.map(this.elementAt(_).asInstanceOf[EnemySquare].getEnemy)
     val nowIndexList = enemyLocList.map(enemyTravelPath.indexOf(_))
@@ -88,7 +102,6 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
      this.elementAt(location) match {
        case square: EnemySquare => {
           this.update(location, new MapSquare(location.x, location.y))
-          println("UHFEUI")
                  killCount += 1
        }
        case _ =>

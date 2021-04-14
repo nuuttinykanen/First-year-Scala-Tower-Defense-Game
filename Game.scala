@@ -19,16 +19,29 @@ class Game(player: Player, waves: Vector[Wave]) {
  def startWave() = ???
 
  def endWave() = {
+   pauseGame()
    waveList = waveList.drop(1)
+   println("\n\nWAVE END\n\n")
    if(waveList.nonEmpty) wave = this.waveList.head
    else endGame()
  }
 
- def endGame() = ???
+ def endGame() = done = true
 
  private var enemyMoveCounter = 0
 
- def passTime() = {
+ private var pause = false
+ private var done = false
+
+ def continueGame() = pause = false
+ def pauseGame() = pause = true
+
+ def isPaused: Boolean = pause
+ def isDone: Boolean = this.done
+
+def passTime() = {
+  if(isPaused) println("isPaused")
+  else {
    if(gameMap.getProjectiles.nonEmpty) gameMap.getProjectiles.foreach(n => if(n != null) n.move(2))
    gameMap.healthCheckRemoval()
    gameMap.scanProjectiles()
@@ -40,21 +53,18 @@ class Game(player: Player, waves: Vector[Wave]) {
    }
 
    enemyMoveCounter += 1
-
+   if(this.getMap.getPenaltyHealth.isDefined) this.getPlayer.changeHealth(-1 * this.getMap.getPenaltyHealth.get)()
+   println(gameMap.getEnemySquares)
    if(!wave.enemyListEmpty) spawnEnemy()
-   else endWave()
+   else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty && false) endWave()
  }
+}
+
 
  def spawnEnemy() = {
    if(!this.wave.enemyListEmpty && this.gameMap.elementAt(gameMap.getEnemySpawn).isInstanceOf[EnemyPathSquare]) {
      this.gameMap.placeEnemy(this.wave.popNext.get, this.gameMap.getEnemySpawn)
    }
- }
-
- private var enemyList = collection.mutable.Buffer[Enemy]()
- def enemiesPresent = enemyList
-
- def placeTower(map: LevelMap, tower: Recruit, x: Double, y: Double) = {
  }
 
 }

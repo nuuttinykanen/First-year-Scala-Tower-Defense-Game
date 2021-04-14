@@ -57,7 +57,7 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
         }
        }
      }
-   new Projectile(5, target, spawnLoc, this.map)
+   new Projectile(4, target, spawnLoc, this.map)
  }
 
 }

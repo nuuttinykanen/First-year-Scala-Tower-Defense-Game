@@ -18,78 +18,17 @@ object test extends App {
 
   game.getPlayer.changeMoney(9000)()
   // PLACING RECRUITS
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(30, 6)))
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(4, 2)))
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(7, 10)))
 
   // START GAME
-  game.passTime()
-  game.passTime()
-  game.passTime()
   println(s"${game.getMap.getEnemySquares.map(_.getEnemy).map(_.getHealth)}")
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
   println(game.getMap.getProjectiles)
 
   println(s"Projectiles: ${game.getMap.getProjectiles}")
   println(s"Projectile positions: ${game.getMap.getProjectiles.map(_.getLocation)}")
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
-  game.passTime()
+  while(!game.isDone) {
+    game.passTime()
+    println(game.getPlayer.getHealth)
+  }
 
   println(s"Projectile positions: ${game.getMap.getProjectiles.map(_.getLocation)}")
   println(s"Enemies in range: ${game.getMap.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")

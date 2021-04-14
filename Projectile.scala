@@ -22,7 +22,7 @@ class Projectile(strength: Int, target: Enemy, square: MapSquare, map: LevelMap)
          case None =>
         }
       }
-      if(abs(this.currentLocation.distance(getTargetLocation.get)) < 2) {
+      if(abs(this.currentLocation.distance(getTargetLocation.get)) < 1) {
         target.changeHealth(-1 * strength)()
         println("Enemy took damage")
         println(this.map.getProjectiles.map(_.getLocation))
