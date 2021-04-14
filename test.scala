@@ -26,18 +26,14 @@ object test extends App {
   game.passTime()
   game.passTime()
   game.passTime()
-  val projec = game.getMap.getProjectiles.head
+  println(s"${game.getMap.getEnemySquares.map(_.getEnemy).map(_.getHealth)}")
   game.passTime()
-  println(projec.getLocation)
-  println(projec.getTargetLocation)
+
   game.passTime()
-  println(projec.getLocation)
-  println(projec.getTargetLocation)
   game.passTime()
-  println(projec.getLocation)
-  println(projec.getTargetLocation)
+  println(game.getMap.getProjectiles)
+
   println(s"Projectiles: ${game.getMap.getProjectiles}")
-  println(s"Projectile targets: ${game.getMap.getProjectiles.map(_.getTargetLocation)}")
   println(s"Projectile positions: ${game.getMap.getProjectiles.map(_.getLocation)}")
   game.passTime()
   game.passTime()
@@ -50,6 +46,7 @@ object test extends App {
   println(s"List of recruits and their positions: ${game.getMap.getRecruitSquares.map(_.getRecruit).zip(game.getMap.getRecruitSquares.map(_.getGridPos))}\n")
   println(s"List of enemies and their positions: ${game.getMap.getEnemySquares.map(_.getEnemy).zip(game.getMap.getEnemySquares.map(_.getGridPos))}\n")
   println(s"The current wave: ${game.getWave.getEnemyList}\n")
+  println(s"Enemy squares: ${game.getMap.getEnemySquares}")
 
   println(s"Enemy health list: ${game.getMap.getEnemySquares.map(_.getEnemy).map(_.getHealth)}")
 }

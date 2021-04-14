@@ -29,12 +29,12 @@ class Game(player: Player, waves: Vector[Wave]) {
  private var enemyMoveCounter = 0
 
  def passTime() = {
+   if(gameMap.getProjectiles.nonEmpty) gameMap.getProjectiles.foreach(n => if(n != null) n.move())
    gameMap.healthCheckRemoval()
    gameMap.scanProjectiles()
-   if(gameMap.getProjectiles.nonEmpty) gameMap.getProjectiles.foreach(_.move())
    gameMap.getRecruits.foreach(_.attack())
 
-   if(enemyMoveCounter > 2) {
+   if(enemyMoveCounter > 0) {
       this.gameMap.moveEnemies()
       enemyMoveCounter = 0
    }

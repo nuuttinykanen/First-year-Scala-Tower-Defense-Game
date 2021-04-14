@@ -48,7 +48,15 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   def healthCheckRemoval() = {
      val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
-     if(list.nonEmpty) list.foreach(n => this.removeEnemy(n.getLocation))
+     if(list.nonEmpty) {
+       list.foreach(n => if(this.getEnemySquares.exists(_.getEnemy == n)) this.removeEnemy(this.getEnemySquares.find(_.getEnemy == n).get))
+       this.getProjectiles.foreach(n => if(list.contains(n.getTarget)) this.removeProjectile(n))
+     }
+  }
+
+  def getEnemyLocation(target: Enemy): Option[EnemySquare] = {
+    if(this.getEnemySquares.nonEmpty) this.getEnemySquares.find(_.getEnemy == target)
+    else None
   }
 
   def removeAllEnemies() = this.getEnemySquares.foreach(n => this.removeEnemy(GridPos(n.x, n.y)))
@@ -77,9 +85,12 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   }
 
   def removeEnemy(location: GridPos) = {
-     if(this.elementAt(location).isInstanceOf[EnemyPathSquare]) {
-        this.enemyGraveyard += this.elementAt(location).asInstanceOf[EnemySquare].getEnemy
-        this.update(location, new MapSquare(location.x, location.y))
+     this.elementAt(location) match {
+       case square: EnemySquare => {
+          this.enemyGraveyard += square.getEnemy
+          this.update(location, new MapSquare(location.x, location.y))
+       }
+       case _ =>
      }
   }
 

@@ -28,29 +28,34 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   }
 
   def attack() = {
-     if(this.enemiesInRange.nonEmpty) {
+     if(getTargetLocation.isDefined) {
        val newProjectile = createProjectile
        this.map.addProjectile(newProjectile)
      }
   }
 
+  def getTargetLocation: Option[EnemySquare] = {
+     if(enemiesInRange.nonEmpty) map.getEnemyLocation(this.enemiesInRange.head)
+     else None
+  }
+
   def createProjectile = {
-    val target = this.enemiesInRange.head
-    val spawnLoc: MapSquare = {
-        if(abs(this.currentLocation.xDiff(target.getLocation)) >= abs(this.currentLocation.yDiff(target.getLocation))) {
-          this.currentLocation.xDirectionOf(target.getLocation) match {
+     val target = this.enemiesInRange.head
+     val spawnLoc: MapSquare = {
+        if(abs(this.currentLocation.xDiff(getTargetLocation.get)) >= abs(this.currentLocation.yDiff(getTargetLocation.get))) {
+          this.currentLocation.xDirectionOf(getTargetLocation.get) match {
            case Some(way) => this.map.squareNeighbor(this.currentLocation, way)
            case None => this.currentLocation
            }
         }
        else {
-        this.currentLocation.yDirectionOf(target.getLocation) match {
+        this.currentLocation.yDirectionOf(getTargetLocation.get) match {
           case Some(way) => this.map.squareNeighbor(this.currentLocation, way)
           case None => this.currentLocation
         }
        }
-   }
-   new Projectile(20, target, spawnLoc, this.map)
+     }
+   new Projectile(3, target, spawnLoc, this.map)
  }
 
 }

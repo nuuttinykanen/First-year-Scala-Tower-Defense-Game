@@ -3,13 +3,6 @@ import o1.grid.GridPos
 
 abstract class Enemy(health: Int, speed: Int, moneyDrop: Int, status: Status, immunitites: Vector[Status], enemiesInside: Vector[Enemy]) {
 
-private var currentLocation: MapSquare = new MapSquare(0, 0)
-private var pastLocation: Option[MapSquare] = None
-
-def getLocation = currentLocation
-def changeLocation(newLoc: GridPos) = currentLocation
-def getPastLocation = pastLocation
-
 private var currentHealth = health
 private var currentSpeed  = speed
 private var currentStatus = status
@@ -19,7 +12,7 @@ def getSpeed: Int     = currentSpeed
 def getStatus: Status = currentStatus
 
 def changeSpeed(amount: Int)() = currentSpeed = currentSpeed + amount
-def changeHealth(amount: Int)() = currentHealth = currentHealth + amount
+def changeHealth(amount: Int)() = currentHealth += amount
 def changeStatus(newStatus: Status)() = currentStatus = newStatus
 
 }
