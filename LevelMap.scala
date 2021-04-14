@@ -2,14 +2,15 @@ import o1.grid._
 import collection.mutable.Buffer
 class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
+  var killCount = 0
+  def getKillCount = killCount
+
   private val startPosition = (100, 60)
   private val endPosition = (0, 20)
 
   var enemyTravelPath = Buffer[GridPos]()
 
   private var projectiles = Buffer[Projectile]()
-  var graveyard = Buffer[Projectile]()
-  var enemyGraveyard = Buffer[Enemy]()
 
   def getProjectiles = projectiles
 
@@ -17,7 +18,6 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
 
   def removeProjectile(projectile: Projectile) = {
     if(this.projectiles.contains(projectile)) projectiles -= projectile
-    graveyard += projectile
   }
 
   def scanProjectiles() = {
@@ -50,7 +50,7 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
      val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
      if(list.nonEmpty) {
        list.foreach(n => if(this.getEnemySquares.exists(_.getEnemy == n)) this.removeEnemy(this.getEnemySquares.find(_.getEnemy == n).get))
-       this.getProjectiles.foreach(n => if(list.contains(n.getTarget)) this.removeProjectile(n))
+       this.getProjectiles.foreach(n => if(n != null && list.contains(n.getTarget)) this.removeProjectile(n))
      }
   }
 
@@ -87,8 +87,9 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
   def removeEnemy(location: GridPos) = {
      this.elementAt(location) match {
        case square: EnemySquare => {
-          this.enemyGraveyard += square.getEnemy
           this.update(location, new MapSquare(location.x, location.y))
+          println("UHFEUI")
+                 killCount += 1
        }
        case _ =>
      }

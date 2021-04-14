@@ -15,6 +15,8 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   def getSellPrice = sellPrice
   def getCost = cost
 
+  def getLocation = currentLocation
+
   def enemiesInRange: Vector[Enemy] = {
     var enemyList = Buffer[Enemy]()
 
@@ -55,7 +57,7 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
         }
        }
      }
-   new Projectile(3, target, spawnLoc, this.map)
+   new Projectile(5, target, spawnLoc, this.map)
  }
 
 }

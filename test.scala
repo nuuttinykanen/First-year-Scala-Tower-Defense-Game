@@ -16,11 +16,11 @@ object test extends App {
   val game = formGame.processData
   formGame.formMap(game.getMap)
 
+  game.getPlayer.changeMoney(9000)()
   // PLACING RECRUITS
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(3, 3)))
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(4, 3)))
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(10, 7)))
-  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(50, 6)))
+  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(30, 6)))
+  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(4, 2)))
+  game.getPlayer.hireRecruit(new Simon(game.getMap), game.getMap.elementAt(GridPos(7, 10)))
 
   // START GAME
   game.passTime()
@@ -38,8 +38,59 @@ object test extends App {
   game.passTime()
   game.passTime()
 
-  println(s"Graveyard: ${game.getMap.graveyard}")
-  println(s"Dead enemies: ${game.getMap.enemyGraveyard}")
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+  game.passTime()
+
   println(s"Projectile positions: ${game.getMap.getProjectiles.map(_.getLocation)}")
   println(s"Enemies in range: ${game.getMap.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
   println(s"The enemy path: ${game.getMap.enemyTravelPath}")
@@ -48,5 +99,9 @@ object test extends App {
   println(s"The current wave: ${game.getWave.getEnemyList}\n")
   println(s"Enemy squares: ${game.getMap.getEnemySquares}")
 
+  println(s"Recruit locations by themself: ${game.getMap.getRecruits.map(_.getLocation)}")
+
   println(s"Enemy health list: ${game.getMap.getEnemySquares.map(_.getEnemy).map(_.getHealth)}")
+
+  println(s"Kill count: ${game.getMap.getKillCount}")
 }

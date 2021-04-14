@@ -17,9 +17,9 @@ def changeStatus(newStatus: Status)() = currentStatus = newStatus
 
 }
 
-class Zombie extends Enemy(20, 10, 10, new Confused, Vector[Status](), Vector[Enemy]())
+class Zombie extends Enemy(5, 10, 10, new Confused, Vector[Status](), Vector[Enemy]())
 
-class ZombieCarriage extends Enemy(20, 10, 10, new Confused, Vector[Status](), Vector[Enemy](new Zombie, new Zombie, new Zombie))
+class ZombieCarriage extends Enemy(10, 10, 10, new Confused, Vector[Status](), Vector[Enemy](new Zombie, new Zombie, new Zombie))
 
 class MichaelMyers extends Enemy(20, 10, 10, new Confused, Vector[Status](), Vector[Enemy](new Zombie, new Zombie, new Zombie))
 
