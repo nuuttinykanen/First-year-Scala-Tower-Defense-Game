@@ -18,6 +18,7 @@ def changeStatus(newStatus: Status)() = currentStatus = newStatus
 
 def getInnerEnemy = this.innerEnemy
 
+def getName = this.getClass.toString
 }
 
 class Zombie extends Enemy(5, 1, 10, 10, new Confused, Vector[Status](), None)

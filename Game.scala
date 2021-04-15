@@ -55,6 +55,7 @@ def passTime() = {
 
    enemyMoveCounter += 1
    if(this.getMap.getPenaltyHealth.isDefined) this.getPlayer.changeHealth(-1 * this.getMap.getPenaltyHealth.get)()
+   println(s"${this.getMap.getEnemySquares.map(_.getEnemy).map(_.getName)}")
 
    if(!wave.enemyListEmpty) spawnEnemy()
    else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty) endWave()

@@ -2,8 +2,8 @@ import util.Random
 
 class Wave(enemyMap: Map[Enemy, Int]) {
 
- private def amount = enemyMap.keys.size
- private var generator = new Random(amount)
+ private def amount = enemyList.size
+ private var generator = new Random()
 
  private var enemyList = enemyMap
 
@@ -30,7 +30,8 @@ class Wave(enemyMap: Map[Enemy, Int]) {
  def popNext = {
    if(this.enemyList.isEmpty) None
    else {
-     var output = this.enemyList.head._1
+     def genNumber = generator.nextInt(amount)
+     var output = Random.shuffle(this.getEnemyList.keys).head
      this.removeEnemy(output)
      output match {
        case some: Zombie => output = new Zombie
