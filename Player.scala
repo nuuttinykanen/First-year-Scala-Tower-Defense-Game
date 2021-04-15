@@ -14,7 +14,8 @@ class Player(health: Int, money: Int, map: LevelMap) {
  def getRecruits: Buffer[Recruit] = currentRecruits
 
  def changeHealth(amount: Int)() = {
-   currentHealth += amount
+   if(currentHealth + amount <= 0) currentHealth = 0
+   else currentHealth += amount
  }
 
  def changeMoney(amount: Int)() = {

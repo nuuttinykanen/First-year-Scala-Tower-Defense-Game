@@ -16,8 +16,6 @@ class Game(player: Player, waves: Vector[Wave]) {
  def getWaveList = waveList
  def getPlayer = player
 
- def startWave() = ???
-
  def endWave() = {
    pauseGame()
    waveList = waveList.drop(1)
@@ -40,7 +38,10 @@ class Game(player: Player, waves: Vector[Wave]) {
  def isDone: Boolean = this.done
 
 def passTime() = {
-  if(isPaused) println("isPaused")
+  if(this.getPlayer.getHealth <= 0) endGame()
+  if(isPaused) {
+     println("isPaused")
+  }
   else {
    if(gameMap.getProjectiles.nonEmpty) gameMap.getProjectiles.foreach(n => if(n != null) n.move(2))
    gameMap.healthCheckRemoval()
@@ -54,15 +55,15 @@ def passTime() = {
 
    enemyMoveCounter += 1
    if(this.getMap.getPenaltyHealth.isDefined) this.getPlayer.changeHealth(-1 * this.getMap.getPenaltyHealth.get)()
-   println(gameMap.getEnemySquares)
+
    if(!wave.enemyListEmpty) spawnEnemy()
-   else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty && false) endWave()
+   else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty) endWave()
  }
 }
 
 
  def spawnEnemy() = {
-   if(!this.wave.enemyListEmpty && this.gameMap.elementAt(gameMap.getEnemySpawn).isInstanceOf[EnemyPathSquare]) {
+   if(this.gameMap.elementAt(gameMap.getEnemySpawn).isInstanceOf[EnemyPathSquare] && !this.gameMap.elementAt(gameMap.getEnemySpawn).isOccupied) {
      this.gameMap.placeEnemy(this.wave.popNext.get, this.gameMap.getEnemySpawn)
    }
  }

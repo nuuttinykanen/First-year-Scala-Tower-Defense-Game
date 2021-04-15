@@ -21,6 +21,8 @@ class Wave(enemyMap: Map[Enemy, Int]) {
    }
  }
 
+ def waveSize = this.enemyMap.values.sum
+
  def getEnemyList = enemyList
 
  def enemyListEmpty = enemyList.isEmpty

@@ -39,25 +39,46 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     else GridPos(0, 0)
   }
 
-  def getLastSquare = this.elementAt(this.enemyTravelPath.last)
+  def getLastSquare = {
+    val list = this.getEnemySquares.filter(_ == this.enemyTravelPath.last)
+    if(list.nonEmpty) list.headOption
+    else None
+  }
 
   def checkLastSquare() = {
-    if(this.elementAt(getLastSquare).isInstanceOf[EnemySquare]) {
-       this.removeEnemy(getLastSquare)
-       this.penaltyHealth = Some(getLastSquare.asInstanceOf[EnemySquare].getEnemy.getAttack)
+    if(getLastSquare.isDefined) {
+     this.penaltyHealth = Some(getLastSquare.get.getEnemy.getAttack)
+     this.removeEnemy(getLastSquare.get)
     }
+  }
+
+  def moveEnemy(enemySquare: EnemySquare)() = {
+    val currentIndex = enemyTravelPath.indexOf(enemySquare)
+    val currentPos = enemyTravelPath(currentIndex)
+    val newCurrentSquare = new EnemyPathSquare(currentPos.x, currentPos.y)
+
+    this.update(currentPos, newCurrentSquare)
+
+    val nextIndex = currentIndex + 1
+    val nextPos = enemyTravelPath(nextIndex)
+    val newSquare = new EnemySquare(nextPos.x, nextPos.y, enemySquare.getEnemy)
+
+    this.update(nextPos, newSquare)
   }
 
   def moveEnemies() = {
     if(this.penaltyHealth.isDefined) this.penaltyHealth = None
     checkLastSquare()
-    val enemyLocList = enemyTravelPath.filter(this.elementAt(_).isInstanceOf[EnemySquare]).toVector
-    val enemyList = enemyLocList.map(this.elementAt(_).asInstanceOf[EnemySquare].getEnemy)
-    val nowIndexList = enemyLocList.map(enemyTravelPath.indexOf(_))
-    val futureIndexList = nowIndexList.map(_ + 1)
-    val zipped = enemyLocList.zip(nowIndexList).zip(enemyList)
-    zipped.foreach(n => this.update(enemyTravelPath(n._1._2 + 1), new EnemySquare(enemyTravelPath(n._1._2 + 1).x, enemyTravelPath(n._1._2 + 1).y, n._2)))
-    zipped.foreach(n => this.update(enemyTravelPath(n._1._2), new EnemyPathSquare(n._1._1.x, n._1._1.y)))
+    this.getEnemySquares.reverse.foreach(moveEnemy(_)())
+  }
+
+  def replaceWithInner(enemy: Enemy): Boolean = {
+    if(enemy.getInnerEnemy.isDefined && this.getEnemyLocation(enemy).isDefined && this.getEnemyLocation(enemy).get != this.enemyTravelPath.last) {
+       val currentLoc = this.getEnemyLocation(enemy)
+       this.update(currentLoc.get, new EnemySquare(currentLoc.get.x, currentLoc.get.y, enemy.getInnerEnemy.get))
+       true
+    }
+    else false
   }
 
   def healthCheckRemoval() = {
@@ -96,13 +117,19 @@ class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
     if(this.elementAt(location).isInstanceOf[EnemyPathSquare] && !this.elementAt(location).isOccupied) {
        this.update(location, new EnemySquare(location.x, location.y, enemy))
     }
+    else println("FAILED TO PLACE ENEMY")
   }
 
   def removeEnemy(location: GridPos) = {
      this.elementAt(location) match {
        case square: EnemySquare => {
-          this.update(location, new MapSquare(location.x, location.y))
-                 killCount += 1
+          if(replaceWithInner(square.getEnemy)) {
+            println("REPLACED CARRIAGE")
+          }
+          else {
+            this.update(location, new EnemyPathSquare(location.x, location.y))
+            println("REMOVED ENEMY")
+          }
        }
        case _ =>
      }

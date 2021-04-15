@@ -98,7 +98,7 @@ object formGame {
       var returnList = mutable.Buffer[GridPos]()
       for(each <- 0  to  50) returnList += new GridPos(5, each)
       for(each <- 6  to  50) returnList += new GridPos(each, 50)
-      for(each <- 50 to 199) returnList += new GridPos(50, each)
+      for(each <- 51 to 199) returnList += new GridPos(50, each)
      returnList.toVector
    }
    map.initializeEnemyPath(gridPosVector)

@@ -20,15 +20,25 @@ object test extends App {
   // PLACING RECRUITS
 
   // START GAME
-  println(s"${game.getMap.getEnemySquares.map(_.getEnemy).map(_.getHealth)}")
-  println(game.getMap.getProjectiles)
 
-  println(s"Projectiles: ${game.getMap.getProjectiles}")
-  println(s"Projectile positions: ${game.getMap.getProjectiles.map(_.getLocation)}")
+  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 40))
+  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(53, 53))
+  println(s"Here is the coming wave: ${game.getWave.getEnemyList}")
+  println(s"Size of aforementioned wave: ${game.getWave.waveSize}")
+
+  var pauseTicker = 0
   while(!game.isDone) {
     game.passTime()
     println(game.getPlayer.getHealth)
+    println(s"Enemy amount: ${game.getMap.getEnemySquares.size}")
+    if(game.isPaused) pauseTicker += 1
+    if(pauseTicker > 1000) {
+       game.continueGame()
+       pauseTicker = 0
+    }
   }
+
+  println(s"Enemy path: ${game.getMap.enemyTravelPath}")
 
   println(s"Projectile positions: ${game.getMap.getProjectiles.map(_.getLocation)}")
   println(s"Enemies in range: ${game.getMap.getRecruitSquares.map(_.getRecruit).map(_.enemiesInRange)}")
