@@ -18,16 +18,8 @@ object test extends App {
 
   // START GAME
 
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 40))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(10, 55))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(53, 53))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(60, 55))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(70, 62))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 41))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 42))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 44))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 43))
-  game.getMap.placeRecruit(new Simon(game.getMap), new GridPos(2, 45))
+  println(s"${game.getMap.enemyTravelPath}")
+  println(s"TRAVEL PATH COUNT: ${game.getMap.enemyTravelPath.size}")
 
   println(s"Here is the coming wave: ${game.getWave.getEnemyList}")
   println(s"Size of aforementioned wave: ${game.getWave.waveSize}")
@@ -35,11 +27,13 @@ object test extends App {
   println(s"Player stats: ${game.getPlayer.getHealth}, ${game.getPlayer.getMoney}")
   println(s"Map dimensions: ${game.getMap.width}, ${game.getMap.height}")
   var pauseTicker = 0
-  while(game.isDone) {
+  var ticker = 0
+  while(!game.isDone) {
     game.passTime()
-    println(game.getPlayer.getHealth)
+    println(s"Ticker: ${ticker}\n")
     println(s"Enemy amount: ${game.getMap.getEnemySquares.size}")
     if(game.isPaused) pauseTicker += 1
+    else     ticker += 1
     if(pauseTicker > 1000) {
        game.continueGame()
        pauseTicker = 0

@@ -113,6 +113,13 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
      }
   }
 
+  def upgradeRecruit(recruit: Recruit) = {
+     val thisSquare = this.getRecruitSquares.find(_.getRecruit == recruit)
+     if(recruit.getUpgrade.isDefined && thisSquare.isDefined) {
+        this.update(thisSquare.get, new RecruitSquare(thisSquare.get.x, thisSquare.get.y, recruit.getUpgrade.get))
+     }
+  }
+
   def placeEnemy(enemy: Enemy, location: GridPos) = {
     if(this.elementAt(location).isInstanceOf[EnemyPathSquare] && !this.elementAt(location).isOccupied) {
        this.update(location, new EnemySquare(location.x, location.y, enemy))

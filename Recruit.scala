@@ -3,7 +3,7 @@ import o1.grid._
 import collection.mutable.Buffer
 import scala.math.abs
 
-abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap) {
+abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap, upgrade: Option[Recruit]) {
 
   def getName = this.name
 
@@ -16,6 +16,8 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   def getCost = cost
 
   def getLocation = currentLocation
+
+  def getUpgrade = this.upgrade
 
   def enemiesInRange: Vector[Enemy] = {
     var enemyList = Buffer[Enemy]()

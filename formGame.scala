@@ -79,7 +79,7 @@ object formGame {
        playerData.take(2) match {
         case "HP" => startHealth = playerData.slice(2, 6).toInt
         case "MN" => startMoney = playerData.slice(2, 6).toInt
-        case _    => throw new IOException
+        case _    => throw new IOException("Error in reading player data.")
        }
        playerData = playerData.drop(6)
      }
@@ -88,7 +88,7 @@ object formGame {
 
    mapData.take(4) match {
        case "SIZE" => mapSize = mapData.slice(4, 7).toInt
-       case _ => throw new IOException("Did not find map size.")
+       case _ => throw new IOException("Error in reading map size.")
    }
    mapData = mapData.drop(7)
 
