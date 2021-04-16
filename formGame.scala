@@ -6,8 +6,8 @@ object formGame {
  val sourceFile = "gameInfo.txt"
  var sourceFileText = mutable.Buffer[String]()
 
- var gamePlayer = new Player(100, 300, new LevelMap(200, 200))
- var gameMap = new LevelMap(200, 200)
+ var gamePlayer = new Player(100, 300, new LevelMap(200))
+ var gameMap = new LevelMap(200)
  var waves: Option[Map[Int, Wave]] = None
 
  def readFile = {
@@ -84,19 +84,15 @@ object formGame {
        playerData = playerData.drop(6)
      }
 
-   var mapWidth = 200
-   var mapLength = 200
+   var mapSize = 200
 
-   for(each <- 1 to 2) {
-     mapData.take(1) match {
-       case "W" => mapWidth = mapData.slice(1, 4).toInt
-       case "L" => mapLength = mapData.slice(1, 4).toInt
-       case _ => throw new IOException
-     }
-     mapData = mapData.drop(4)
+   mapData.take(4) match {
+       case "SIZE" => mapSize = mapData.slice(4, 7).toInt
+       case _ => throw new IOException("Did not find map size.")
    }
+   mapData = mapData.drop(7)
 
-   gameMap = new LevelMap(mapWidth, mapLength)
+   gameMap = new LevelMap(mapSize)
    initializeMap(gameMap, mapData)
 
    new Player(startHealth, startMoney, gameMap)
@@ -146,18 +142,13 @@ object formGame {
       startOnEdge && endOnEdge
    }
 
-   println(s"COORDS: ${coords}")
-   println(s"SPLIT COORDS: ${coords.map(_.split(':'))}")
    if(!pathIsConnected(coords)) throw new IOException("The input path is not connected! Check the input coordinates in gameInfo.txt.")
    if(!pathReachesEdges(coords)) throw new IOException("The input path does not reach the map edges! Check the input coordinates in gameInfo.txt.")
 
    var coordList = mutable.Buffer[GridPos]()
-
-       val tuples = coords.map(_.split(':').map(n => ((n.split(',').head.toInt, n.split(',').last.toInt))))
-       println(tuples.mkString)
+   val tuples = coords.map(_.split(':').map(n => ((n.split(',').head.toInt, n.split(',').last.toInt))))
 
    def addCoords(coords: Vector[String]) = {
-
        val tuples = coords.map(n => (n.split(':').head, n.split(':').last))
        val tuplesAgain = tuples.map(n => (n._1.split(',').map(_.toInt), n._2.split(',').map(_.toInt)))
        val gridPoses = tuplesAgain.map(n => (new GridPos(n._1.head, n._1.last), new GridPos(n._2.head, n._2.last)))
@@ -165,7 +156,7 @@ object formGame {
        def addGridPoses(gridpos1: GridPos, gridpos2: GridPos) = {
           val difference = gridpos1.diff(gridpos2)
           val direction: CompassDir = {
-            if(gridpos1.x < gridpos2.x) CompassDir.East
+            if(gridpos1.x < gridpos2.x)      CompassDir.East
             else if(gridpos1.x > gridpos2.x) CompassDir.West
             else if(gridpos1.y < gridpos2.y) CompassDir.South
             else if(gridpos1.y > gridpos2.y) CompassDir.North
@@ -175,13 +166,12 @@ object formGame {
           var pathCounter = 0
           def checkPathTowards(pos: GridPos): Boolean = {
              pathCounter += 1
-             if(pathCounter > gameMap.width) throw new IOException("The enemy path appears to be diagonal or it goes beyond the map, which is not possible.")
+             if(pathCounter > gameMap.size) throw new IOException("The enemy path appears to be diagonal or it goes beyond the map, which is not possible.")
              pos != gridpos2
           }
 
           gridpos1.pathTowards(direction).takeWhile(n => checkPathTowards(n)).foreach(coordList += _)
         }
-
          gridPoses.foreach(n => addGridPoses(n._1, n._2))
      }
 
@@ -194,6 +184,5 @@ object formGame {
 
      println(gameMap.enemyTravelPath)
      if(!doesNotOverlap(coords)) throw new IOException("The input path overlaps with itself! Check the input coordinates in gameInfo.txt.")
-
    }
 }

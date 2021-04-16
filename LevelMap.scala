@@ -1,6 +1,6 @@
 import o1.grid._
 import collection.mutable.Buffer
-class LevelMap(x: Int, y: Int) extends Grid[MapSquare](x, y) {
+class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   var killCount = 0
   def getKillCount = killCount
