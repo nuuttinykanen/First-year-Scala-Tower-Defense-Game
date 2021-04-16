@@ -7,6 +7,7 @@ object formGame {
  var sourceFileText = mutable.Buffer[String]()
 
  var gamePlayer = new Player(100, 300, new LevelMap(200, 200))
+ var gameMap = new LevelMap(200, 200)
  var waves: Option[Map[Int, Wave]] = None
 
  def readFile = {
@@ -33,12 +34,14 @@ object formGame {
 
    var returnMap = Map[Int, Map[Enemy, Int]]()
 
-   var text: Vector[String] = sourceFileText.mkString.split('#').toVector
+   var text: Vector[String] = sourceFileText.mkString.split('#').toVector.drop(1)
 
    text.head.take(6) match {
-     case "PLAYER" => gamePlayer = formPlayer(text.head)
+     case "PLAYER" => gamePlayer = formPlayer(text.take(2))
      case _ => throw new IOException()
    }
+
+   text = text.drop(2)
 
    for(each <- text.tail) {
      var waveNumbers = collection.mutable.Buffer[Int]()
@@ -61,18 +64,42 @@ object formGame {
    }
    val waveList = returnMap.map(n => new Wave(n._2)).toVector
 
+
+
    new Game(gamePlayer, waveList)
  }
 
- def formPlayer(data: String): Player = {
-    var stats = data.drop(6)
-    var startHealth = 100
-    var startMoney = 100
-    stats.take(2) match {
-      case "HP" => startHealth = stats.slice(2, 6).toInt
-      case "MN" => startMoney = stats.slice(2, 6).toInt
-    }
-    new Player(startHealth, startMoney, new LevelMap(200, 200))
+ def formPlayer(data: Vector[String]): Player = {
+    var playerData = data.head.drop(6)
+    var mapData = data.last.drop(3)
+
+     var startHealth = 100
+     var startMoney = 100
+     for(each <- 1 to 2) {
+       playerData.take(2) match {
+        case "HP" => startHealth = playerData.slice(2, 6).toInt
+        case "MN" => startMoney = playerData.slice(2, 6).toInt
+        case _    => throw new IOException
+       }
+       playerData = playerData.drop(6)
+     }
+
+   var mapWidth = 200
+   var mapLength = 200
+
+   for(each <- 1 to 2) {
+     mapData.take(1) match {
+       case "W" => mapWidth = mapData.slice(1, 4).toInt
+       case "L" => mapLength = mapData.slice(1, 4).toInt
+       case _ => throw new IOException
+     }
+     mapData = mapData.drop(4)
+   }
+
+   gameMap = new LevelMap(mapWidth, mapLength)
+   initializeMap(gameMap, mapData)
+
+   new Player(startHealth, startMoney, gameMap)
  }
 
  def getEnemies(data: String, map: Map[Enemy, Int]): Map[Enemy, Int] = {
@@ -93,17 +120,80 @@ object formGame {
   enemyMap
  }
 
- def formMap(map: LevelMap) = {
-   val gridPosVector = {
-      var returnList = mutable.Buffer[GridPos]()
-      for(each <- 0  to  50) returnList += new GridPos(5, each)
-      for(each <- 6  to  50) returnList += new GridPos(each, 50)
-      for(each <- 51 to 199) returnList += new GridPos(50, each)
-     returnList.toVector
+ def initializeMap(map: LevelMap, coordsText: String) = {
+
+   val coords = coordsText.split('<').toVector.map(_.trim)
+
+
+
+   def pathIsConnected(coords: Vector[String]): Boolean = {
+      coords.dropRight(1).forall(
+        n => n.split(':').last == coords(coords.indexOf(n) + 1).split(':').head
+      )
    }
-   map.initializeEnemyPath(gridPosVector)
- }
 
- val gameMap = new LevelMap(200, 200)
+   def pathReachesEdges(coords: Vector[String]): Boolean = {
+      val startCoords = coords.head.split(':').head.split(',').map(_.trim)
+      val endCoords = coords.last.split(':').last.split(',').map(_.trim)
 
+      val possibleEdges = {
+        var edges = mutable.Buffer[Int](0, 0)
+        edges += this.gameMap.width
+        edges += this.gameMap.height
+      }
+      def startOnEdge = possibleEdges.contains(startCoords.head.toInt) ||  possibleEdges.contains(startCoords.last.toInt)
+      def endOnEdge = possibleEdges.contains(endCoords.head.toInt) || (possibleEdges.contains(endCoords.last.toInt))
+      startOnEdge && endOnEdge
+   }
+
+   println(s"COORDS: ${coords}")
+   println(s"SPLIT COORDS: ${coords.map(_.split(':'))}")
+   if(!pathIsConnected(coords)) throw new IOException("The input path is not connected! Check the input coordinates in gameInfo.txt.")
+   if(!pathReachesEdges(coords)) throw new IOException("The input path does not reach the map edges! Check the input coordinates in gameInfo.txt.")
+
+   var coordList = mutable.Buffer[GridPos]()
+
+       val tuples = coords.map(_.split(':').map(n => ((n.split(',').head.toInt, n.split(',').last.toInt))))
+       println(tuples.mkString)
+
+   def addCoords(coords: Vector[String]) = {
+
+       val tuples = coords.map(n => (n.split(':').head, n.split(':').last))
+       val tuplesAgain = tuples.map(n => (n._1.split(',').map(_.toInt), n._2.split(',').map(_.toInt)))
+       val gridPoses = tuplesAgain.map(n => (new GridPos(n._1.head, n._1.last), new GridPos(n._2.head, n._2.last)))
+
+       def addGridPoses(gridpos1: GridPos, gridpos2: GridPos) = {
+          val difference = gridpos1.diff(gridpos2)
+          val direction: CompassDir = {
+            if(gridpos1.x < gridpos2.x) CompassDir.East
+            else if(gridpos1.x > gridpos2.x) CompassDir.West
+            else if(gridpos1.y < gridpos2.y) CompassDir.South
+            else if(gridpos1.y > gridpos2.y) CompassDir.North
+            else throw new IOException("Could not determine CompassDir for creating enemy path.")
+          }
+          coordList += gridpos1
+          var pathCounter = 0
+          def checkPathTowards(pos: GridPos): Boolean = {
+             pathCounter += 1
+             if(pathCounter > gameMap.width) throw new IOException("The enemy path appears to be diagonal or it goes beyond the map, which is not possible.")
+             pos != gridpos2
+          }
+
+          gridpos1.pathTowards(direction).takeWhile(n => checkPathTowards(n)).foreach(coordList += _)
+        }
+
+         gridPoses.foreach(n => addGridPoses(n._1, n._2))
+     }
+
+     addCoords(coords)
+     gameMap.initializeEnemyPath(coordList.toVector)
+
+     def doesNotOverlap(coords: Vector[String]) = {
+       gameMap.enemyTravelPath == gameMap.enemyTravelPath.distinct
+     }
+
+     println(gameMap.enemyTravelPath)
+     if(!doesNotOverlap(coords)) throw new IOException("The input path overlaps with itself! Check the input coordinates in gameInfo.txt.")
+
+   }
 }
