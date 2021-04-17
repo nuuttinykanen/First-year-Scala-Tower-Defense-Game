@@ -41,7 +41,7 @@ object formGame {
      case _ => throw new IOException()
    }
 
-   text = text.drop(2)
+   text = text.drop(1)
 
    for(each <- text.tail) {
      var waveNumbers = collection.mutable.Buffer[Int]()

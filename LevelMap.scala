@@ -34,6 +34,11 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
     filtered.map(_.asInstanceOf[EnemySquare])
   }
 
+  def getEnemiesOnPath = {
+    val elements = this.enemyTravelPath.map(n => this.elementAt(n))
+    elements.filter(_.isInstanceOf[EnemySquare]).map(_.asInstanceOf[EnemySquare]).reverse
+  }
+
   def getEnemySpawn = {
     if(enemyTravelPath.nonEmpty) enemyTravelPath.head
     else GridPos(0, 0)
@@ -69,7 +74,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   def moveEnemies() = {
     if(this.penaltyHealth.isDefined) this.penaltyHealth = None
     checkLastSquare()
-    this.getEnemySquares.reverse.foreach(moveEnemy(_)())
+    this.getEnemiesOnPath.foreach(moveEnemy(_)())
   }
 
   def replaceWithInner(enemy: Enemy): Boolean = {
@@ -98,7 +103,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   def getRecruitSquares = this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
 
-  def getRecruits = getRecruitSquares.map(_.getRecruit)
+  def getAttackRecruits: Vector[AttackRecruit] = getRecruitSquares.map(_.getRecruit).filter(_.isInstanceOf[AttackRecruit]).map(_.asInstanceOf[AttackRecruit])
 
   def placeRecruit(recruit: Recruit, location: GridPos) = {
     if(this.elementAt(location).isFree && this.elementAt(location).isInstanceOf[MapSquare]) {

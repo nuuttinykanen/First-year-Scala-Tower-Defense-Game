@@ -10,12 +10,12 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   def setLocation(square: RecruitSquare) = currentLocation = square
 
   private var currentLocation = new RecruitSquare(0, 0, this)
+  def getLocation = currentLocation
+
   private var sellPrice = (cost / 8) * 5
 
   def getSellPrice = sellPrice
   def getCost = cost
-
-  def getLocation = currentLocation
 
   def getUpgrade = this.upgrade
 
@@ -30,36 +30,5 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
     scanRange(this.currentLocation)
     enemyList.toVector
   }
-
-  def attack() = {
-     if(getTargetLocation.isDefined) {
-       val newProjectile = createProjectile
-       this.map.addProjectile(newProjectile)
-     }
-  }
-
-  def getTargetLocation: Option[EnemySquare] = {
-     if(enemiesInRange.nonEmpty) map.getEnemyLocation(this.enemiesInRange.head)
-     else None
-  }
-
-  def createProjectile = {
-     val target = this.enemiesInRange.head
-     val spawnLoc: MapSquare = {
-        if(abs(this.currentLocation.xDiff(getTargetLocation.get)) >= abs(this.currentLocation.yDiff(getTargetLocation.get))) {
-          this.currentLocation.xDirectionOf(getTargetLocation.get) match {
-           case Some(way) => this.map.squareNeighbor(this.currentLocation, way)
-           case None => this.currentLocation
-           }
-        }
-       else {
-        this.currentLocation.yDirectionOf(getTargetLocation.get) match {
-          case Some(way) => this.map.squareNeighbor(this.currentLocation, way)
-          case None => this.currentLocation
-        }
-       }
-     }
-   new Projectile(8, target, spawnLoc, this.map)
- }
 
 }

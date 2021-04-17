@@ -26,12 +26,15 @@ object test extends App {
 
   println(s"Player stats: ${game.getPlayer.getHealth}, ${game.getPlayer.getMoney}")
   println(s"Map dimensions: ${game.getMap.width}, ${game.getMap.height}")
+
+  println(s"Wave list: ${game.getWaveList}")
   var pauseTicker = 0
   var ticker = 0
   while(!game.isDone) {
     game.passTime()
     println(s"Ticker: ${ticker}\n")
     println(s"Enemy amount: ${game.getMap.getEnemySquares.size}")
+    println(s"Enemy locations: ${game.getMap.getEnemySquares}")
     if(game.isPaused) pauseTicker += 1
     else     ticker += 1
     if(pauseTicker > 1000) {
