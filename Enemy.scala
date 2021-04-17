@@ -25,6 +25,6 @@ class Zombie extends Enemy(5, 1, 10, 10, new Confused, Vector[Status](), None)
 
 class ZombieCarriage extends Enemy(10, 3, 10, 10, new Confused, Vector[Status](), Some(new Zombie))
 
-class MichaelMyers extends Enemy(20, 10, 10, 10, new Confused, Vector[Status](), None)
+class MichaelMyers extends Enemy(1000, 10, 10, 10, new Confused, Vector[Status](), None)
 
 

@@ -138,6 +138,8 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   def getAttackRecruits: Vector[AttackRecruit] = getRecruitSquares.map(_.getRecruit).filter(_.isInstanceOf[AttackRecruit]).map(_.asInstanceOf[AttackRecruit])
 
+  def getSupportRecruits: Vector[SupportRecruit] = getRecruitSquares.map(_.getRecruit).filter(_.isInstanceOf[SupportRecruit]).map(_.asInstanceOf[SupportRecruit])
+
   def getRecruits = getRecruitSquares.map(_.getRecruit)
 
   def placeRecruit(recruit: Recruit, location: GridPos) = {
@@ -173,10 +175,12 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   }
 
   def attack(recruit: AttackRecruit) = {
-     if(getTargetLocation(recruit).isDefined) {
+     if(getTargetLocation(recruit).isDefined && recruit.canAttack) {
        val newProjectile = createProjectile(recruit)
        this.addProjectile(newProjectile)
+       recruit.restartCooldown()
      }
+     else if(getTargetLocation(recruit).isDefined) recruit.reload()
   }
 
   def getTargetLocation(recruit: AttackRecruit): Option[EnemySquare] = {
@@ -203,6 +207,20 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
    new Projectile(recruit.getStrength, target, spawnLoc, this)
  }
 
+ def supportAura(recruit: SupportRecruit) = {
+    var auraList = collection.mutable.Buffer[MapSquare]()
+    def scanRange(location: RecruitSquare) = {
+      val list = this.allElements.filter(_.distance(location) <= recruit.getRange)
+      list.foreach(auraList += _)
+    }
+    scanRange(recruit.getLocation)
+    auraList.foreach(n => recruit.supportEffect(n))
+ }
+
+ def removeTempModifiers() = {
+   this.getAttackRecruits.foreach(_.removeModifiers())
+ }
+
   def squareNeighbor(square: MapSquare, direction: CompassDir) = this.elementAt(square.neighbor(direction))
 
 }
@@ -227,7 +245,6 @@ class RecruitSquare(x: Int, y: Int, recruit: Recruit) extends MapSquare(x, y) {
   occupied = true
 
   def getRecruit = recruit
-
 }
 
 class EnemyPathSquare(x: Int, y: Int) extends MapSquare(x, y) {

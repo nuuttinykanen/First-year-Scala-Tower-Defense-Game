@@ -16,6 +16,10 @@ object test extends App {
   val game = formGame.processData
   // PLACING RECRUITS
   game.getPlayer.hireRecruit(new Ash, new MapSquare(3, 15))
+  game.getPlayer.hireRecruit(new FatherMerrin, new MapSquare(3, 16))
+
+  println(game.getMap.getRecruits.map(_.getClass))
+
   println(s"RECRUITS: ${game.getMap.getRecruits}")
   // START GAME
 
@@ -38,8 +42,7 @@ object test extends App {
     println(s"Ticker: ${ticker}\n")
     println(s"Enemy amount: ${game.getMap.getEnemySquares.size}")
     println(s"Enemy locations: ${game.getMap.getEnemySquares}")
-    println(s"Recruits: ${game.getMap.getAttackRecruits}")
-    println(s"\n\nProjectiles: ${game.getMap.getProjectiles}")
+    println(s"Enemy HP: ${game.getMap.getEnemiesOnPath.map(_.getEnemy).map(_.getHealth)}")
     if(game.isPaused) pauseTicker += 1
     else     ticker += 1
     if(pauseTicker > 1000) {
