@@ -109,6 +109,8 @@ object formGame {
        case "Z" => newEnemy = new Zombie
        case "C" => newEnemy = new ZombieCarriage
        case "M" => newEnemy = new MichaelMyers
+       case "D" => newEnemy = new Dracula
+       case "B" => newEnemy = new Bat
        case _   => newEnemy = new Zombie
      }
      enemyMap += newEnemy -> amount

@@ -113,6 +113,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   def checkLastSquare() = {
     if(getLastSquare.isDefined) {
      this.penaltyHealth = Some(getLastSquare.get.getEnemy.getAttack)
+     println(s"${getLastSquare.get.getEnemy.getName} reached the end!")
      this.removeEnemy(getLastSquare.get)
     }
   }
