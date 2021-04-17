@@ -3,9 +3,11 @@ import o1.grid._
 import collection.mutable.Buffer
 import scala.math.abs
 
-abstract class Recruit(name: String, description: String, range: Int, cost: Int, map: LevelMap, upgrade: Option[Recruit]) {
+abstract class Recruit(name: String, description: String, range: Int, cost: Int, upgrade: Option[Recruit]) {
 
   def getName = this.name
+
+  def getRange = this.range
 
   def setLocation(square: RecruitSquare) = currentLocation = square
 
@@ -18,17 +20,5 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
   def getCost = cost
 
   def getUpgrade = this.upgrade
-
-  def enemiesInRange: Vector[Enemy] = {
-    var enemyList = Buffer[Enemy]()
-
-    def scanRange(location: RecruitSquare) = {
-      val list = this.map.getEnemySquares.filter(_.distance(location) <= this.range)
-      list.foreach(enemyList += _.getEnemy)
-    }
-
-    scanRange(this.currentLocation)
-    enemyList.toVector
-  }
 
 }

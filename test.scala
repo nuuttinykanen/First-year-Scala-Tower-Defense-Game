@@ -15,7 +15,8 @@ object test extends App {
 
   val game = formGame.processData
   // PLACING RECRUITS
-
+  game.getPlayer.hireRecruit(new Ash, new MapSquare(3, 15))
+  println(s"RECRUITS: ${game.getMap.getRecruits}")
   // START GAME
 
   println(s"${game.getMap.enemyTravelPath}")
@@ -28,6 +29,8 @@ object test extends App {
   println(s"Map dimensions: ${game.getMap.width}, ${game.getMap.height}")
 
   println(s"Wave list: ${game.getWaveList}")
+
+  val ash = game.getMap.getAttackRecruits.headOption
   var pauseTicker = 0
   var ticker = 0
   while(!game.isDone) {
@@ -35,9 +38,12 @@ object test extends App {
     println(s"Ticker: ${ticker}\n")
     println(s"Enemy amount: ${game.getMap.getEnemySquares.size}")
     println(s"Enemy locations: ${game.getMap.getEnemySquares}")
+    println(s"Recruits: ${game.getMap.getAttackRecruits}")
+    println(s"\n\nProjectiles: ${game.getMap.getProjectiles}")
     if(game.isPaused) pauseTicker += 1
     else     ticker += 1
     if(pauseTicker > 1000) {
+       game.getPlayer.upgradeRecruit(ash.get)()
        game.continueGame()
        pauseTicker = 0
     }

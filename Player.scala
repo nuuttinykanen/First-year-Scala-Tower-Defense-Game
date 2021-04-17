@@ -41,10 +41,14 @@ class Player(health: Int, money: Int, map: LevelMap) {
  }
  def sellRecruit(recruit: Recruit)() =  {
    val returnPrice = recruit.getSellPrice
-   this.changeMoney(returnPrice)
+   this.changeMoney(returnPrice)()
  }
 
  def upgradeRecruit(recruit: Recruit)() = {
-   recruit
+   if(recruit.getUpgrade.isDefined) {
+      this.getMap.upgradeRecruit(recruit)
+      this.changeMoney(recruit.getUpgrade.get.getCost * -1)()
+      println(s"You upgraded ${recruit.getName} to ${recruit.getUpgrade.get.getName}")
+   }
  }
 }
