@@ -132,10 +132,11 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   }
 
   def healthCheckRemoval() = {
+     emptyDeathMarks
      val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
      if(list.nonEmpty) {
-       println(s"${list.map(_.getName)}")
-       list.foreach(n => if(this.getEnemySquares.exists(_.getEnemy == n)) {
+       list.foreach(n => if(this.getEnemySquares.exists(_.getEnemy == n)){
+         this.deathMarks += this.getEnemySquares.find(_.getEnemy == n).get
          this.removeEnemy(this.getEnemySquares.find(_.getEnemy == n).get)
          if(this.bounty.isDefined) {
             bounty = Some(bounty.get + n.getBounty)
@@ -167,6 +168,10 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
         this.update(location, new FreeSquare(location.x, location.y))
      }
   }
+
+  private var deathMarks = collection.mutable.Buffer[MapSquare]()
+  def getDeathMarks = this.deathMarks
+  def emptyDeathMarks() = deathMarks = deathMarks.empty
 
   def upgradeRecruit(recruit: Recruit) = {
      val thisSquare = this.getRecruitSquares.find(_.getRecruit == recruit)

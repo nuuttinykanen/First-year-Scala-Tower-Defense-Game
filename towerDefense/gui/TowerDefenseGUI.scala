@@ -2,15 +2,19 @@ package towerDefense.gui
 import o1.grid.GridPos
 import towerDefense._
 
+import scala.collection.mutable.Map
 import javax.imageio._
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.event.ActionListener
+import java.awt.image.BufferedImage
 import java.io.File
+import java.util
 import javax.swing.UIManager
 import scala.swing.{Action, Dimension, GridBagPanel, Insets, Label, MainFrame, Menu, MenuBar, MenuItem, Point, SimpleSwingApplication, TextArea, TextField}
 import scala.swing._
 import java.util._
+import scala.Predef.->
 import scala.swing.event.MouseMoved
 
 object TowerDefenseGUI extends SimpleSwingApplication {
@@ -31,12 +35,15 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
        game.passTime()
        player.hireRecruit(new Simon, new MapSquare(18, 19))
-       println(s"${gameMap.getEnemySquares}")
      }
   }
 
-  val timer = new javax.swing.Timer(5000, listener)
+  val timer = new javax.swing.Timer(500, listener)
   timer.start()
+
+  val michaelSprite = ImageIO.read(new File("towerDefense/graphics/michaelmyers.png"))
+  var enemySprites: scala.collection.mutable.Map[String, BufferedImage] = Map("MichaelMyers" -> michaelSprite)
+
 
   def top = new MainFrame {
     title = "Night Stand"
@@ -47,27 +54,41 @@ object TowerDefenseGUI extends SimpleSwingApplication {
     maximumSize = new Dimension(gameMap.width * 10, gameMap.width * 10)
 }
 
+
  val gridMap = new Component {
       var color = Color.black
       override def paintComponent(g: Graphics2D) = {
         g.setColor(color)
         for(each <- gameMap.allElements.map(n => (n.x, n.y))) {
           gameMap.elementAt(GridPos(each._1, each._2)) match {
+             case square: EnemySquare => {
+               if(enemySprites.keys.exists(n => square.getEnemy.getName == n)) {
+                 g.drawImage(enemySprites(square.getEnemy.getName), each._1, each._2, null)
+               }
+               g.setColor(Color.blue)
+             }
              case square: EnemyPathSquare => {
                g.setColor(Color.red)
-             }
-             case square: EnemySquare => {
-               g.setColor(Color.blue)
              }
              case square: RecruitSquare => {
                g.setColor(Color.magenta)
              }
              case square: FreeSquare => {
-               g.setColor(Color.white)
+               g.setColor(Color.gray)
              }
              case _ => g.setColor(Color.ORANGE)
            }
            g.fillRect(each._1 * 20, each._2 * 20, 50, 50)
+        }
+
+        for(each <- gameMap.getProjectiles.map(_.getLocation)) {
+           g.setColor(Color.BLACK)
+           g.fillOval(each.x * 20, each.y * 20, 10, 10)
+        }
+
+        for(each <- gameMap.getDeathMarks) {
+           g.setColor(Color.PINK)
+           g.fillRect(each.x * 20, each.y * 20, 1, 1)
         }
 
        listenTo(mouse.moves)

@@ -55,7 +55,10 @@ def passTime() = {
    if(this.getMap.getBounty.isDefined) this.getPlayer.changeMoney(this.getMap.getBounty.get)()
 
    if(!wave.enemyListEmpty) spawnEnemy()
-   else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty) endWave()
+   else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty) {
+     gameMap.emptyDeathMarks()
+     endWave()
+   }
  }
 }
 
