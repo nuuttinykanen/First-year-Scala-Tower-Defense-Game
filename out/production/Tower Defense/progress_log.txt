@@ -21,7 +21,7 @@ Workload: 8 to 10 hours
 
  - Worked on base grid.
  - Worked on scala.swing GUI
- - Worked on RecruitStore functionality.
+ - Worked on towerDefense.RecruitStore functionality.
 
  I am currently behind schedule. I realized how much work the GUI requires, so I will be significantly less ambitious. I'll have to focus on this project
  for the next two weeks.
@@ -33,7 +33,7 @@ Workload: 8 to 10 hours
   - Functional projectiles
   - Able to place recruits on map
   - Enemies come in waves
-  - passTime() method in Game as a main focus
+  - passTime() method in towerDefense.Game as a main focus
 
  I have an almost functional game in code. Currently behind schedule and I will have to invest much, much more for the last stretch.
  I still have to work on the GUI and the game itself.

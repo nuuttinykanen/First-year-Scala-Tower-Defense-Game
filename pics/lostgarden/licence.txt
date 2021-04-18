@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------
  All the artwork contained by this folder is from a collection called
 
-   "Danc's Miraculously Flexible Game Prototyping Tiles"
+   "Danc's Miraculously Flexible towerDefense.Game Prototyping Tiles"
 
  and is made by Daniel Cook (Lostgarden.com). It is licensed and
  included here under the Creative Commons Attribution 3.0 License.
