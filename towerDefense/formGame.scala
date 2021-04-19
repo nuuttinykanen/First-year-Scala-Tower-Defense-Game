@@ -47,10 +47,9 @@ object formGame {
     }
 
     text = text.drop(1)
-
     for (each <- text.tail) {
       var waveNumbers = collection.mutable.Buffer[Int]()
-      var enemyMap = Map[Enemy, Int]()
+      var enemyMap: Map[Enemy, Int] = Map[Enemy, Int]()
       var waveNumber = 1
       var waveNumberString = ""
       var index = 0
@@ -65,10 +64,10 @@ object formGame {
       waveNumbers += waveNumber
       enemyMap = getEnemies(enemyText, enemyMap)
 
-      returnMap += (waveNumber -> enemyMap)
+      returnMap += waveNumber -> enemyMap
     }
-    val waveList = returnMap.map(n => new Wave(n._2)).toVector
 
+    val waveList = returnMap.toArray.sortBy(_._1).map(_._2).map(new Wave(_))
 
     new Game(gamePlayer, waveList)
   }
@@ -88,15 +87,7 @@ object formGame {
       playerData = playerData.drop(6)
     }
 
-    var mapSize = 200
-
-    mapData.take(4) match {
-      case "SIZE" => mapSize = mapData.slice(4, 7).toInt
-      case _ => throw new IOException("Error in reading map size.")
-    }
-    mapData = mapData.drop(7)
-
-    gameMap = new LevelMap(mapSize)
+    gameMap = new LevelMap(20)
     initializeMap(gameMap, mapData)
 
     new Player(startHealth, startMoney, gameMap)
@@ -126,7 +117,6 @@ object formGame {
 
     val coords = coordsText.split('<').toVector.map(_.trim)
 
-
     def pathIsConnected(coords: Vector[String]): Boolean = {
       coords.dropRight(1).forall(
         n => n.split(':').last == coords(coords.indexOf(n) + 1).split(':').head
@@ -144,7 +134,6 @@ object formGame {
       }
 
       def startOnEdge = possibleEdges.contains(startCoords.head.toInt) || possibleEdges.contains(startCoords.last.toInt)
-
       def endOnEdge = possibleEdges.contains(endCoords.head.toInt) || (possibleEdges.contains(endCoords.last.toInt))
 
       startOnEdge && endOnEdge

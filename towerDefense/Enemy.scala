@@ -24,8 +24,8 @@ class ZombieCarriage extends Enemy(10, 3, 1, Some(new Zombie))
 
 class MichaelMyers extends Enemy(1000, 10, 1, None)
 
-class Dracula extends Enemy(25, 10, 1, Some(new Bat))
+class Dracula extends Enemy(25, 10, 1, None)
 
-class Bat extends Enemy(4, 10, 1, None)
+class Bat extends Enemy(4, 10, 1, Some(new Dracula))
 
 

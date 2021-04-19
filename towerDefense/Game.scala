@@ -1,5 +1,8 @@
 package towerDefense
-class Game(player: Player, waves: Vector[Wave]) {
+
+import towerDefense.gui.TowerDefenseGUI.gameMap
+
+class Game(player: Player, waves: Array[Wave]) {
 
  private var round = 1
  private var wave: Wave = this.waves.head
@@ -44,6 +47,9 @@ def passTime() = {
    gameMap.getSupportRecruits.foreach(n => gameMap.supportAura(n))
    gameMap.getAttackRecruits.foreach(n => gameMap.attack(n))
    gameMap.removeTempModifiers()
+    println(s"${this.getWaveList.map(_.getEnemyList)}")
+      println(s"${gameMap.getEnemySquares.map(_.getEnemy).map(_.getName).map(_.drop(13))}")
+
 
    if(enemyMoveCounter > 0) {
       this.gameMap.moveEnemies()

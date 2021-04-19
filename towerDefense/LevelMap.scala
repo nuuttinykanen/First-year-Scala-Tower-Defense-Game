@@ -157,7 +157,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   def getRecruits = getRecruitSquares.map(_.getRecruit)
 
   def placeRecruit(recruit: Recruit, location: GridPos) = {
-    if(this.elementAt(location).isFree && this.elementAt(location).isInstanceOf[FreeSquare]) {
+    if(this.contains(location) && this.elementAt(location).isInstanceOf[FreeSquare]) {
        this.update(location, new RecruitSquare(location.x, location.y, recruit))
        recruit.setLocation(this.elementAt(location).asInstanceOf[RecruitSquare])
     }
