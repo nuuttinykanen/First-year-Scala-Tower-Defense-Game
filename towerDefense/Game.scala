@@ -7,18 +7,24 @@ class Game(player: Player, waves: Array[Wave]) {
  private var round = 1
  private var wave: Wave = this.waves.head
  private var waveList = waves
+ private var waveNumber = 1
  private var gameMap = player.getMap
 
  def getMap = gameMap
  def getWave = wave
  def getWaveList = waveList
+ def getWaveNumber = this.waveNumber
+ def getWavesLeft = this.getWaveList.length - 1
  def getPlayer = player
 
  def endWave() = {
    pauseGame()
    waveList = waveList.drop(1)
    println("\n\nWAVE END\n\n")
-   if(waveList.nonEmpty) wave = this.waveList.head
+   if(waveList.nonEmpty) {
+      waveNumber += 1
+      wave = this.waveList.head
+   }
    else endGame()
  }
 
@@ -47,11 +53,8 @@ def passTime() = {
    gameMap.getSupportRecruits.foreach(n => gameMap.supportAura(n))
    gameMap.getAttackRecruits.foreach(n => gameMap.attack(n))
    gameMap.removeTempModifiers()
-    println(s"${this.getWaveList.map(_.getEnemyList)}")
-      println(s"${gameMap.getEnemySquares.map(_.getEnemy).map(_.getName).map(_.drop(13))}")
 
-
-   if(enemyMoveCounter > 0) {
+   if(enemyMoveCounter > 2) {
       this.gameMap.moveEnemies()
       enemyMoveCounter = 0
    }

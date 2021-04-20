@@ -170,7 +170,6 @@ object formGame {
 
         gridpos1.pathTowards(direction).takeWhile(n => checkPathTowards(n)).foreach(coordList += _)
       }
-
       gridPoses.foreach(n => addGridPoses(n._1, n._2))
     }
 

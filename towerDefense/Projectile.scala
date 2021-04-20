@@ -2,7 +2,9 @@ package towerDefense
 
 import scala.math.abs
 
-class Projectile(strength: Int, target: Enemy, square: MapSquare, map: LevelMap) {
+class Projectile(sender: AttackRecruit, strength: Int, target: Enemy, square: MapSquare, map: LevelMap) {
+
+  def getSender = this.sender
 
   def getTarget = this.target
 

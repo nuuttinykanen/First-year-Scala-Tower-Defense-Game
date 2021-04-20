@@ -239,7 +239,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
         }
        }
      }
-   new Projectile(recruit.getStrength, target, spawnLoc, this)
+   new Projectile(recruit, recruit.getStrength, target, spawnLoc, this)
  }
 
  def supportAura(recruit: SupportRecruit) = {
