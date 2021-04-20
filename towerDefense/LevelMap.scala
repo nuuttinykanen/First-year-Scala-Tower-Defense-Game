@@ -192,6 +192,18 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
     enemyList.toVector
   }
 
+  def squaresInRange(recruit: Recruit): Vector[MapSquare] = {
+    var squareList = Buffer[MapSquare]()
+
+    def scanRange(location: RecruitSquare) = {
+      val list = this.allElements.filter(_.distance(location) <= recruit.getRange)
+      list.foreach(squareList += _)
+    }
+
+    scanRange(recruit.getLocation)
+    squareList.toVector
+  }
+
   def attack(recruit: AttackRecruit) = {
      if(getTargetLocation(recruit).isDefined && recruit.canAttack) {
        println(s"${recruit.getName} attacks!")
