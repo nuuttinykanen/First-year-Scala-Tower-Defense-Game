@@ -15,7 +15,7 @@ import scala.swing.{Action, Dimension, GridBagPanel, Insets, Label, MainFrame, M
 import scala.swing._
 import java.util._
 import scala.Predef.->
-import scala.swing.event.MouseMoved
+import scala.swing.event.{MouseClicked, MouseMoved, MouseReleased}
 
 object TowerDefenseGUI extends SimpleSwingApplication {
   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
@@ -157,15 +157,23 @@ object TowerDefenseGUI extends SimpleSwingApplication {
       override def paintComponent(g: Graphics2D) = {
 
        listenTo(mouse.moves)
+       listenTo(mouse.clicks)
        reactions += {
+        case MouseReleased(source, point, modifiers, clicks, triggersPopup) => {
+           if(gameMap.contains(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum))) {
+
+           }
+         }
         case MouseMoved(c, point, mods) => {
-           gameMap.elementAt(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum)) match {
+          if(gameMap.contains(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum))) {
+            gameMap.elementAt(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum)) match {
              case square: RecruitSquare => rangePrint = Some(square.getRecruit)
              case _ => {
                rangePrint = None
              }
            }
-            // the components must be redrawn to make the selection visible
+          }
+          // the components must be redrawn to make the selection visible
           repaint()
         }
       }
@@ -220,11 +228,41 @@ object TowerDefenseGUI extends SimpleSwingApplication {
           }
         }
 
-        g.setColor(Color.BLACK)
-        g.drawString(s"Player health: ${player.getHealth}", 10, gameMap.width * scaleNum + 2)
-        g.drawString(s"Player money: ${player.getMoney}", 10, gameMap.width * scaleNum + 12)
-        g.drawString(s"Wave: ${game.getWaveNumber}", 10, gameMap.width * scaleNum + 22)
-        g.drawString(s"Waves left: ${game.getWavesLeft}", 10, gameMap.width * scaleNum + 32)
+        // RECRUIT STORE BASE
+        g.setColor(Color.darkGray)
+        g.fillRect(gameMap.width * scaleNum, 0, 100, gameMap.width * scaleNum - scaleNum)
+        g.setColor(Color.red)
+        g.drawRect(gameMap.width * scaleNum, 0, 100, gameMap.width * scaleNum - scaleNum)
+        g.drawRect(gameMap.width * scaleNum, 0, 100, scaleNum * 5)
+
+        g.setColor(Color.white)
+        g.drawString("- NIGHT STAND -", gameMap.width * scaleNum, 10)
+        g.drawString(s"Player health: ${player.getHealth}", gameMap.width * scaleNum, scaleNum)
+        g.drawString(s"Player money: ${player.getMoney}", gameMap.width * scaleNum, scaleNum * 2)
+        g.drawString(s"Wave: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum * 3)
+        g.drawString(s"Waves left: ${game.getWavesLeft}", gameMap.width * scaleNum, scaleNum * 4)
+
+        val recStore = new RecruitStore
+        def scaledWidth = gameMap.width * scaleNum
+        def recStoreCoords(row: Int) = scala.Vector[GridPos](GridPos(gameMap.width * scaleNum + 5, scaleNum * (2 * row + 6)), GridPos(gameMap.width * scaleNum + 55, scaleNum * (2 * row + 6)))
+
+        var first = true
+        var counter = 0
+        var row = 1
+        for(each <- recStore.getRecruits) {
+            if(!first) counter += 1
+            else first = false
+            if(counter > 1) {
+              row += 1
+              counter = 0
+            }
+            g.drawImage(getRecruitSprite(each), recStoreCoords(row)(counter).x, recStoreCoords(row)(counter).y, null)
+
+
+            g.setFont(Font(Font.Serif, Font.Bold, 6))
+            g.drawString(s"${each.getName}", recStoreCoords(row)(counter).x, recStoreCoords(row)(counter).y - 20)
+            g.drawString(s"${each.getCost} G", recStoreCoords(row)(counter).x, recStoreCoords(row)(counter).y - 10)
+        }
 
        // RECRUIT STORE
    //    g.setColor(Color.BLACK)

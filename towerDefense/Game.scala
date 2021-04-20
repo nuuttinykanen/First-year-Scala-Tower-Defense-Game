@@ -14,7 +14,10 @@ class Game(player: Player, waves: Array[Wave]) {
  def getWave = wave
  def getWaveList = waveList
  def getWaveNumber = this.waveNumber
- def getWavesLeft = this.getWaveList.length - 1
+ def getWavesLeft = {
+   if(this.getWaveList.length - 1 < 0) 0
+   else this.getWaveList.length - 1
+ }
  def getPlayer = player
 
  def endWave() = {
