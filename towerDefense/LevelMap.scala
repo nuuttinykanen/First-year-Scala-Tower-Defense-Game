@@ -48,7 +48,6 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   def moveEnemies() = {
     if(this.penaltyHealth.isDefined) this.penaltyHealth = None
-    if(this.bounty.isDefined) this.bounty = None
     checkLastSquare()
     this.getEnemiesOnPath.foreach(moveEnemy(_)())
   }
@@ -132,6 +131,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   }
 
   def healthCheckRemoval() = {
+     if(this.bounty.isDefined) this.bounty = None
      emptyDeathMarks
      val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
      if(list.nonEmpty) {
