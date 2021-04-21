@@ -7,6 +7,7 @@ import scala.collection.mutable.Map
 import javax.imageio._
 import java.awt.{Color, Graphics2D, Image}
 import java.awt.event.ActionListener
+import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util
@@ -37,11 +38,8 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   val listener = new ActionListener() {
      def actionPerformed(e: java.awt.event.ActionEvent) = {
-
-       game.passTime()
-
        gridMap.repaint()
-
+       game.passTime()
        if(game.isPaused) game.continueGame()
      }
   }
@@ -150,33 +148,80 @@ object TowerDefenseGUI extends SimpleSwingApplication {
      projecSprites(index).getScaledInstance(scaleNum, scaleNum, Image.SCALE_DEFAULT)
   }
 
+ val recStore = new RecruitStore
+
+ val recruitRectangles = {
+    var recruitBuffer = scala.collection.mutable.Buffer[Recruit]()
+    var rectBuffer = scala.collection.mutable.Buffer[Rectangle2D]()
+    var row = 0
+    for(each <- recStore.getRecruits) {
+         recruitBuffer += each
+         val f = new Rectangle(gameMap.width * scaleNum, scaleNum * (5 + row), scaleNum * 4, scaleNum)
+         row += 1
+         rectBuffer += f
+    }
+    recruitBuffer.zip(rectBuffer).toVector
+ }
+
+ def posOnStore(point: Point): Boolean = {
+    recruitRectangles.map(_._2).exists(n => n.contains(point.getX, point.getY))
+ }
+
+ def getStoreRecruit(point: Point): Recruit = {
+   val recruit = recruitRectangles.find(_._2.getBounds.contains(point.getX, point.getY))
+   if(recruit.isDefined) {
+       recruit.get._1 match {
+         case some: Simon => new Simon
+         case some: VanHelsing => new VanHelsing
+         case some: Ash => new Ash
+         case some: ChainsawAsh => new ChainsawAsh
+         case some: MacReady => new MacReady
+         case some: Venkman => new Venkman
+         case some: Suzy => new Suzy
+         case _ => new Simon
+       }
+   }
+   else throw new IndexOutOfBoundsException
+ }
+
+ def mouseCoord(coord: Point): GridPos = GridPos(coord.getX.toInt / scaleNum, (coord.getY.toInt + scaleNum) / scaleNum)
+
  val gridMap = new Component {
 
       var color = Color.black
-      var rangePrint: Option[Recruit] = None
+      var analyzeRecruit: Option[Recruit] = None
+      var purchaseCandidate: Option[Recruit] = None
+      var mousePoint: Option[Point] = None
       override def paintComponent(g: Graphics2D) = {
 
        listenTo(mouse.moves)
        listenTo(mouse.clicks)
        reactions += {
-        case MouseReleased(source, point, modifiers, clicks, triggersPopup) => {
-           if(gameMap.contains(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum))) {
-
+        case MouseClicked(source, point, modifiers, clicks, triggersPopup) => {
+           if(posOnStore(point)) {
+              purchaseCandidate = Some(getStoreRecruit(point))
            }
-         }
-        case MouseMoved(c, point, mods) => {
-          if(gameMap.contains(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum))) {
-            gameMap.elementAt(GridPos(point.getX.toInt / scaleNum, (point.getY.toInt + scaleNum) / scaleNum)) match {
-             case square: RecruitSquare => rangePrint = Some(square.getRecruit)
-             case _ => {
-               rangePrint = None
+           else if(gameMap.contains(mouseCoord(mousePoint.get))) {
+             if(purchaseCandidate.isDefined && mousePoint.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
+              player.hireRecruit(purchaseCandidate.get, new MapSquare(mouseCoord(mousePoint.get).x, mouseCoord(mousePoint.get).y))
+              purchaseCandidate = None
+             }
+             else gameMap(mouseCoord(mousePoint.get)) match {
+               case square: RecruitSquare => analyzeRecruit = Some(square.getRecruit)
+               case _ => analyzeRecruit = None
              }
            }
+           else {
+             purchaseCandidate = None
+           }
           }
+         case MouseMoved(c, point, mods) => {
+           this.mousePoint = Some(point)
+         }
           // the components must be redrawn to make the selection visible
-          repaint()
-        }
       }
+        g.setColor(Color.gray)
+        g.fillRect(0, 0, gameMap.width * scaleNum, gameMap.width * scaleNum - scaleNum)
 
         for(each <- gameMap.allElements.map(n => (n.x, n.y))) {
           gameMap.elementAt(GridPos(each._1, each._2)) match {
@@ -197,14 +242,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
                g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum, scaleNum, scaleNum)
                g.drawImage(getRecruitSprite(square.getRecruit), each._1 * scaleNum, each._2 * scaleNum - scaleNum, null)
              }
-             case square: FreeSquare => {
-               g.setColor(Color.gray)
-               g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum, scaleNum, scaleNum)
-             }
-             case _ => {
-                g.setColor(Color.ORANGE)
-                g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum, scaleNum, scaleNum)
-             }
+             case _ =>
            }
           g.setColor(Color.black)
           g.drawRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum, scaleNum, scaleNum)
@@ -213,7 +251,6 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
         for(each <- gameMap.getProjectiles.map(_.getLocation)) {
            g.setColor(Color.BLACK)
-           val rotation = gen.nextInt(359)
            g.drawImage(getSpriteFromProjec(gameMap.getProjectiles.find(_.getLocation == each).get), each.x * scaleNum, each.y * scaleNum, null)
         }
 
@@ -221,78 +258,58 @@ object TowerDefenseGUI extends SimpleSwingApplication {
            g.drawImage(bloodSprite, each.x * scaleNum, each.y * scaleNum - scaleNum, null)
         }
 
-        if(rangePrint.isDefined) {
-          for(each <- gameMap.squaresInRange(rangePrint.get).filter(n => gameMap.contains(n))) {
+        if(analyzeRecruit.isDefined) {
+          for(each <- gameMap.squaresInRange(analyzeRecruit.get).filter(n => gameMap.contains(n))) {
              g.setColor(Color.MAGENTA)
              g.drawRect(each.x * scaleNum, each.y * scaleNum - scaleNum, 30, 30)
           }
         }
 
+        if(mousePoint.isDefined && gameMap.contains(mouseCoord(mousePoint.get))) {
+           if(purchaseCandidate.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
+              val gridPlace = gameMap(mouseCoord(mousePoint.get))
+              g.drawImage(getRecruitSprite(purchaseCandidate.get), gridPlace.x * scaleNum, gridPlace.y * scaleNum - scaleNum, null)
+           }
+        }
+
         // RECRUIT STORE BASE
         g.setColor(Color.darkGray)
-        g.fillRect(gameMap.width * scaleNum, 0, 100, gameMap.width * scaleNum - scaleNum)
+        g.fillRect(gameMap.width * scaleNum, 0, scaleNum * 4, gameMap.width * scaleNum - scaleNum)
         g.setColor(Color.red)
-        g.drawRect(gameMap.width * scaleNum, 0, 100, gameMap.width * scaleNum - scaleNum)
-        g.drawRect(gameMap.width * scaleNum, 0, 100, scaleNum * 5)
+        g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, gameMap.width * scaleNum - scaleNum)
+        g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, scaleNum * 5)
 
+
+        val recStore = new RecruitStore
         g.setColor(Color.white)
-        g.drawString("- NIGHT STAND -", gameMap.width * scaleNum, 10)
+        g.drawString("- NIGHT STAND -", gameMap.width * scaleNum, 15)
         g.drawString(s"Player health: ${player.getHealth}", gameMap.width * scaleNum, scaleNum)
         g.drawString(s"Player money: ${player.getMoney}", gameMap.width * scaleNum, scaleNum * 2)
         g.drawString(s"Wave: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum * 3)
         g.drawString(s"Waves left: ${game.getWavesLeft}", gameMap.width * scaleNum, scaleNum * 4)
 
-        val recStore = new RecruitStore
         def scaledWidth = gameMap.width * scaleNum
-        def recStoreCoords(row: Int) = scala.Vector[GridPos](GridPos(gameMap.width * scaleNum + 5, scaleNum * (2 * row + 6)), GridPos(gameMap.width * scaleNum + 55, scaleNum * (2 * row + 6)))
+        def recStoreCoords(row: Int): GridPos = GridPos(gameMap.width * scaleNum, scaleNum * (5 + row))
 
         var first = true
-        var counter = 0
-        var row = 1
+        var row = 0
         for(each <- recStore.getRecruits) {
-            if(!first) counter += 1
-            else first = false
-            if(counter > 1) {
-              row += 1
-              counter = 0
-            }
-            g.drawImage(getRecruitSprite(each), recStoreCoords(row)(counter).x, recStoreCoords(row)(counter).y, null)
+            g.setColor(Color.RED)
+            g.drawRect(gameMap.width * scaleNum, scaleNum * (5 + row), scaleNum * 4, scaleNum)
 
-
-            g.setFont(Font(Font.Serif, Font.Bold, 6))
-            g.drawString(s"${each.getName}", recStoreCoords(row)(counter).x, recStoreCoords(row)(counter).y - 20)
-            g.drawString(s"${each.getCost} G", recStoreCoords(row)(counter).x, recStoreCoords(row)(counter).y - 10)
+            g.setColor(Color.WHITE)
+            g.drawImage(getRecruitSprite(each), recStoreCoords(row).x, recStoreCoords(row).y, null)
+            row += 1
+            g.setFont(Font(Font.Serif, Font.Bold, (scaleNum / 3)))
+            g.drawString(s"${each.getCost} G", recStoreCoords(row).x + 40, recStoreCoords(row).y - 18)
+            g.setFont(Font(Font.Serif, Font.Bold, (scaleNum * 3) / (scaleNum / 5 + each.getName.length / 2)))
+            g.drawString(s"${each.getName}", recStoreCoords(row).x + 40, recStoreCoords(row).y - 5)
         }
-
-       // RECRUIT STORE
-   //    g.setColor(Color.BLACK)
-   //    g.fillRect(gameMap.width * 21, 0, 200, gameMap.width * 21)
-
-
-     //  g.fillRect(0, gameMap.width * 21, gameMap.width * 21 + 200, 100)
-
-
-   //    g.setColor(Color.WHITE)
-     //  g.fillRect(gameMap.width * 21, 0, 10, gameMap.width * 21 + 10)
-     //  g.fillRect(0, gameMap.width * 21, gameMap.width * 21, 10)
+    }
  }
 
-  val zombie = ImageIO.read(new File("towerDefense/graphics/zombie.png"))
-  val floor = ImageIO.read(new File("towerDefense/graphics/castlefloor.png"))
-
-  class GUIMapSquare(x: Int, y: Int) extends Panel {
-    override def paintComponent(g: Graphics2D) = {
-      g.setColor(Color.gray)
-      g.drawRect(x, y, 1, 1)
-    }
-  }
- }
-
- val recruitStore = new Component {
-    override def paintComponent(g: Graphics2D): Unit = {
-       g.setColor(Color.RED)
-       g.fillRect(gameMap.width * 10, 0, 100, gameMap.width * 10)
-    }
+ val recrStore = new BoxPanel(Orientation.Horizontal) {
+   contents += gridMap
  }
 }
 

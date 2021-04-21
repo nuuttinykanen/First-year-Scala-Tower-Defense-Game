@@ -30,7 +30,6 @@ class Projectile(sender: AttackRecruit, strength: Int, target: Enemy, square: Ma
         target.changeHealth(-1 * strength)()
         this.map.removeProjectile(this)
       }
-      else if(count > 0) move(count - 1)
    }
     else this.map.removeProjectile(this)
   }

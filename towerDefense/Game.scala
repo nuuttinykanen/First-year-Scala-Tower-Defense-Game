@@ -34,7 +34,7 @@ class Game(player: Player, waves: Array[Wave]) {
  def endGame() = done = true
 
  private var enemyMoveCounter = 0
-
+ private var spawnCounter = 0
  private var pause = false
  private var done = false
 
@@ -57,7 +57,7 @@ def passTime() = {
    gameMap.getAttackRecruits.foreach(n => gameMap.attack(n))
    gameMap.removeTempModifiers()
 
-   if(enemyMoveCounter > 3) {
+   if(enemyMoveCounter > 2) {
       this.gameMap.moveEnemies()
       enemyMoveCounter = 0
    }
@@ -66,7 +66,13 @@ def passTime() = {
    if(this.getMap.getPenaltyHealth.isDefined) this.getPlayer.changeHealth(-1 * this.getMap.getPenaltyHealth.get)()
    if(this.getMap.getBounty.isDefined) this.getPlayer.changeMoney(this.getMap.getBounty.get)()
 
-   if(!wave.enemyListEmpty) spawnEnemy()
+   if(!wave.enemyListEmpty) {
+       if(spawnCounter > 4) {
+         spawnEnemy()
+         spawnCounter = 0
+       }
+     spawnCounter += 1
+   }
    else if(this.getMap.getEnemySquares.isEmpty && this.getMap.getProjectiles.isEmpty) {
      gameMap.emptyDeathMarks()
      endWave()
