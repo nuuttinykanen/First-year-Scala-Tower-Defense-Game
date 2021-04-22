@@ -32,6 +32,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
   val listener = new ActionListener() {
      def actionPerformed(e: java.awt.event.ActionEvent) = {
        gridMap.repaint()
+       gameMap.removeTempModifiers()
        game.passTime()
        if(game.isPaused) game.continueGame()
      }
@@ -283,6 +284,14 @@ object TowerDefenseGUI extends SimpleSwingApplication {
                g.setColor(Color.gray)
                g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum, scaleNum, scaleNum)
                g.drawImage(getRecruitSprite(square.getRecruit), each._1 * scaleNum, each._2 * scaleNum - scaleNum, null)
+               g.setColor(Color.BLUE)
+               square.getRecruit match {
+                 case some: AttackRecruit => {
+                   g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum + (scaleNum - 4), (some.cooldownPerc * scaleNum.toDouble).toInt, 3)
+                   g.drawRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum + (scaleNum - 4), scaleNum, 3)
+                 }
+                 case _ =>
+               }
              }
              case _ =>
            }
@@ -323,12 +332,13 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
         if(analyzeRecruit.isDefined) {
           g.setColor(Color.WHITE)
-          g.setFont(Font(Font.Serif, Font.Plain, 12))
+           g.setFont(Font(Font.Serif, Font.BoldItalic, 12))
           g.drawString(s"${analyzeRecruit.get.getName}", gameMap.width * scaleNum + 2, scaleNum * 15)
+            g.setFont(Font(Font.Serif, Font.Plain, 11))
           g.drawString(s"Range: ${analyzeRecruit.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 15 + scaleNum / 2)
-          g.drawString(s"Damage: ${analyzeRecruit.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 16)
+          g.drawString(s"Strength: ${analyzeRecruit.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 16)
           analyzeRecruit.get match {
-            case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + scaleNum + 2, scaleNum * 16 + scaleNum / 2)
+            case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + 2, scaleNum * 16 + scaleNum / 2)
             case _ =>
           }
           var num = 0

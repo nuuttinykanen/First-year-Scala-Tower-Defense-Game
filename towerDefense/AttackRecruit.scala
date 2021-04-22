@@ -1,6 +1,6 @@
 package towerDefense
 
-abstract class AttackRecruit(name: String, description: String, range: Int, cooldown: Int, cost: Int, strength: Int, upgrade: Option[Recruit]) extends Recruit(name, description, range, cost, upgrade) {
+abstract class AttackRecruit(name: String, description: String, strength: Int, range: Int, cooldown: Int, cost: Int, upgrade: Option[Recruit]) extends Recruit(name, description, strength, range, cost, upgrade) {
 
   var cooldownModifiers = 0
   def currentCooldown = {
@@ -8,7 +8,7 @@ abstract class AttackRecruit(name: String, description: String, range: Int, cool
      else 0
   }
   def getCooldown = currentCooldown
-
+  def cooldownPerc = attackCounter.toDouble / currentCooldown.toDouble
   var attackCounter = 0
 
   def canAttack = attackCounter == 0
@@ -28,21 +28,20 @@ abstract class AttackRecruit(name: String, description: String, range: Int, cool
   var strengthModifiers = 0
 
   var currentStrength = this.strength + this.strengthModifiers
-  def getStrength = this.currentStrength
 
 }
 
-class Simon extends AttackRecruit("Simon", "", 5, 1, 2, 50, None)
+class Suzy extends AttackRecruit("Suzy", "", 4, 2, 2, 200, None)
 
-class VanHelsing extends AttackRecruit("Van Helsing", "", 5, 2, 2000, 5, None)
+class Simon extends AttackRecruit("Simon", "", 5, 3, 2, 300, None)
 
-class Ash extends AttackRecruit("Ash", "", 5, 10, 1000, 8, Some(new ChainsawAsh))
+class VanHelsing extends AttackRecruit("Van Helsing", "", 8, 5, 3, 600, None)
 
-class ChainsawAsh extends AttackRecruit("Ash with Chainsaw", "", 5, 4, 1, 16, None)
+class Ash extends AttackRecruit("Ash", "", 12, 2, 3, 800, Some(new ChainsawAsh))
 
-class Suzy extends AttackRecruit("Suzy", "", 3, 2, 1, 16, None)
+class ChainsawAsh extends AttackRecruit("Ash with Chainsaw", "", 20, 3, 3, 700, None)
 
-class MacReady extends AttackRecruit("R.J.", "", 5, 2, 1, 16, None)
+class MacReady extends AttackRecruit("R.J.", "", 10, 3, 5, 450, None)
 
-class Venkman extends AttackRecruit("Venkman", "", 3, 2, 1, 16, None)
+class Venkman extends AttackRecruit("Venkman", "", 12, 4, 6, 650, None)
 

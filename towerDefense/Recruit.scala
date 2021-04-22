@@ -1,6 +1,6 @@
 package towerDefense
 
-abstract class Recruit(name: String, description: String, range: Int, cost: Int, upgrade: Option[Recruit]) {
+abstract class Recruit(name: String, description: String, strength: Int, range: Int, cost: Int, upgrade: Option[Recruit]) {
 
   def getName = this.name
   def getDescription = this.description
@@ -30,6 +30,8 @@ abstract class Recruit(name: String, description: String, range: Int, cost: Int,
 
   def getSellPrice = sellPrice
   def getCost = cost
+
+  def getStrength = this.strength
 
   def getUpgrade = this.upgrade
 

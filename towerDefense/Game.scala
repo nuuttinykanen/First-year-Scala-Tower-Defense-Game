@@ -55,7 +55,6 @@ def passTime() = {
    gameMap.scanProjectiles()
    gameMap.getSupportRecruits.foreach(n => gameMap.supportAura(n))
    gameMap.getAttackRecruits.foreach(n => gameMap.attack(n))
-   gameMap.removeTempModifiers()
 
    if(enemyMoveCounter > 2) {
       this.gameMap.moveEnemies()

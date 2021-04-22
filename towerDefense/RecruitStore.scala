@@ -4,7 +4,11 @@ import scala.collection.mutable.Buffer
 class RecruitStore {
 
   // Towers that are available to purchase during the game.
-  private val recruits = Buffer[Recruit](new Simon, new Ash, new VanHelsing, new MacReady, new Suzy, new Venkman, new FatherMerrin)
+  private val recruits = {
+     val list = Buffer[Recruit](new Suzy, new Simon, new MacReady, new VanHelsing, new Venkman, new Ash, new FatherMerrin)
+     require(list.length < 10)
+     list
+  }
 
   def getRecruits: Vector[Recruit] = recruits.toVector
 
