@@ -173,10 +173,29 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   def getDeathMarks = this.deathMarks
   def emptyDeathMarks() = deathMarks = deathMarks.empty
 
+  def matchRecruit(recruit: Recruit) = {
+    recruit match {
+      case some: Simon => new Simon
+      case some: VanHelsing => new VanHelsing
+      case some: Ash => new Ash
+      case some: ChainsawAsh => new ChainsawAsh
+      case some: MacReady => new MacReady
+      case some: Venkman => new Venkman
+      case some: Suzy => new Suzy
+      case some: FatherMerrin => new FatherMerrin
+      case some: EnlightenedMerrin => new EnlightenedMerrin
+      case some: LightkeeperMerrin => new LightkeeperMerrin
+      case some: DrFrankenstein => new DrFrankenstein
+      case some: MadDrFrankenstein => new MadDrFrankenstein
+      case some: InsaneDrFrankenstein => new InsaneDrFrankenstein
+      case _ => new Simon
+      }
+  }
+
   def upgradeRecruit(recruit: Recruit) = {
      val thisSquare = this.getRecruitSquares.find(_.getRecruit == recruit)
      if(recruit.getUpgrade.isDefined && thisSquare.isDefined) {
-        this.update(thisSquare.get, new RecruitSquare(thisSquare.get.x, thisSquare.get.y, recruit.getUpgrade.get))
+        this.update(thisSquare.get, new RecruitSquare(thisSquare.get.x, thisSquare.get.y, matchRecruit(recruit)))
      }
   }
 
