@@ -32,17 +32,17 @@ abstract class AttackRecruit(name: String, description: String, range: Int, cool
 
 }
 
-class Simon extends AttackRecruit("Simon Belmont", "", 5, 1, 2, 5, None)
+class Simon extends AttackRecruit("Simon", "", 5, 1, 2, 50, None)
 
-class VanHelsing extends AttackRecruit("Van Helsing", "", 5, 2, 1, 5, None)
+class VanHelsing extends AttackRecruit("Van Helsing", "", 5, 2, 2000, 5, None)
 
-class Ash extends AttackRecruit("Ash", "", 5, 10, 4, 8, Some(new ChainsawAsh))
+class Ash extends AttackRecruit("Ash", "", 5, 10, 1000, 8, Some(new ChainsawAsh))
 
 class ChainsawAsh extends AttackRecruit("Ash with Chainsaw", "", 5, 4, 1, 16, None)
 
-class Suzy extends AttackRecruit("Suzy Bannion", "", 3, 2, 1, 16, None)
+class Suzy extends AttackRecruit("Suzy", "", 3, 2, 1, 16, None)
 
 class MacReady extends AttackRecruit("R.J.", "", 5, 2, 1, 16, None)
 
-class Venkman extends AttackRecruit("Dr.Venkman", "", 3, 2, 1, 16, None)
+class Venkman extends AttackRecruit("Venkman", "", 3, 2, 1, 16, None)
 

@@ -29,13 +29,6 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   val gen = new Random()
 
-  player.hireRecruit(new Simon, new MapSquare(3, 17))
-
-  player.hireRecruit(new MacReady, new MapSquare(3, 18))
-  player.hireRecruit(new Ash, new MapSquare(1, 14))
-  player.hireRecruit(new Simon, new MapSquare(21, 29))
-  player.hireRecruit(new Suzy, new MapSquare(5, 6))
-
   val listener = new ActionListener() {
      def actionPerformed(e: java.awt.event.ActionEvent) = {
        gridMap.repaint()
@@ -85,7 +78,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   val recruitSprites: scala.Vector[BufferedImage] = {
      var returnList = collection.mutable.Buffer[BufferedImage]()
-     val recruitList = scala.Vector("simon", "vanHelsing", "ash", "chainsawAsh", "macready", "venkman", "suzy")
+     val recruitList = scala.Vector("simon", "vanHelsing", "ash", "chainsawAsh", "macready", "venkman", "suzy", "fathermerrin")
      for(each <- recruitList) {
         returnList += getSprite(each)
      }
@@ -102,6 +95,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
       case some: MacReady => 4
       case some: Venkman => 5
       case some: Suzy => 6
+      case some: FatherMerrin => 7
       case _ => 0
       }
     }
@@ -178,6 +172,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
          case some: MacReady => new MacReady
          case some: Venkman => new Venkman
          case some: Suzy => new Suzy
+         case some: FatherMerrin => new FatherMerrin
          case _ => new Simon
        }
    }
@@ -196,15 +191,16 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
        listenTo(mouse.moves)
        listenTo(mouse.clicks)
+
        reactions += {
-        case MouseClicked(source, point, modifiers, clicks, triggersPopup) => {
+        case MouseReleased(source, point, modifiers, clicks, triggersPopup) => {
            if(posOnStore(point)) {
               purchaseCandidate = Some(getStoreRecruit(point))
            }
            else if(gameMap.contains(mouseCoord(mousePoint.get))) {
              if(purchaseCandidate.isDefined && mousePoint.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
-              player.hireRecruit(purchaseCandidate.get, new MapSquare(mouseCoord(mousePoint.get).x, mouseCoord(mousePoint.get).y))
-              purchaseCandidate = None
+               player.hireRecruit(purchaseCandidate.get, new MapSquare(mouseCoord(mousePoint.get).x, mouseCoord(mousePoint.get).y))
+               purchaseCandidate = None
              }
              else gameMap(mouseCoord(mousePoint.get)) match {
                case square: RecruitSquare => analyzeRecruit = Some(square.getRecruit)
@@ -220,10 +216,56 @@ object TowerDefenseGUI extends SimpleSwingApplication {
          }
           // the components must be redrawn to make the selection visible
       }
-        g.setColor(Color.gray)
-        g.fillRect(0, 0, gameMap.width * scaleNum, gameMap.width * scaleNum - scaleNum)
 
-        for(each <- gameMap.allElements.map(n => (n.x, n.y))) {
+        drawMap(g)
+
+        for(each <- gameMap.getProjectiles.map(_.getLocation)) {
+           g.setColor(Color.BLACK)
+           g.drawImage(getSpriteFromProjec(gameMap.getProjectiles.find(_.getLocation == each).get), each.x * scaleNum, each.y * scaleNum, null)
+        }
+
+        for(each <- gameMap.getDeathMarks) {
+           g.drawImage(bloodSprite, each.x * scaleNum, each.y * scaleNum - scaleNum, null)
+        }
+
+        if(analyzeRecruit.isDefined) {
+          for(each <- gameMap.squaresInRange(analyzeRecruit.get, analyzeRecruit.get.getLocation)) {
+             g.setColor(Color.MAGENTA)
+             g.drawRect(each.x * scaleNum, each.y * scaleNum - scaleNum, 30, 30)
+          }
+        }
+
+        if(mousePoint.isDefined && gameMap.contains(mouseCoord(mousePoint.get))) {
+           if(purchaseCandidate.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
+              for(each <- gameMap.squaresInRange(purchaseCandidate.get, gameMap(mouseCoord(mousePoint.get)))) {
+                 g.setColor(Color.MAGENTA)
+                 g.drawRect(each.x * scaleNum, each.y * scaleNum - scaleNum, 30, 30)
+              }
+              val gridPlace = gameMap(mouseCoord(mousePoint.get))
+              g.drawImage(getRecruitSprite(purchaseCandidate.get), gridPlace.x * scaleNum, gridPlace.y * scaleNum - scaleNum, null)
+           }
+        }
+
+        // RECRUIT STORE BASE
+        g.setColor(Color.red)
+        g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, gameMap.width * scaleNum - scaleNum)
+        g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, scaleNum * 5)
+
+
+        val recStore = new RecruitStore
+
+        drawRecruitStore(g: Graphics2D, analyzeRecruit)
+    }
+ }
+
+ val recrStore = new BoxPanel(Orientation.Horizontal) {
+   contents += gridMap
+ }
+
+  def drawMap(g: Graphics2D) = {
+       g.setColor(Color.gray)
+       g.fillRect(0, 0, gameMap.width * scaleNum, gameMap.width * scaleNum - scaleNum)
+       for(each <- gameMap.allElements.map(n => (n.x, n.y))) {
           gameMap.elementAt(GridPos(each._1, each._2)) match {
              case square: EnemySquare => {
                g.setColor(Color.black)
@@ -246,54 +288,19 @@ object TowerDefenseGUI extends SimpleSwingApplication {
            }
           g.setColor(Color.black)
           g.drawRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum, scaleNum, scaleNum)
-          g.setColor(Color.green)
         }
+   }
 
-        for(each <- gameMap.getProjectiles.map(_.getLocation)) {
-           g.setColor(Color.BLACK)
-           g.drawImage(getSpriteFromProjec(gameMap.getProjectiles.find(_.getLocation == each).get), each.x * scaleNum, each.y * scaleNum, null)
-        }
-
-        for(each <- gameMap.getDeathMarks) {
-           g.drawImage(bloodSprite, each.x * scaleNum, each.y * scaleNum - scaleNum, null)
-        }
-
-        if(analyzeRecruit.isDefined) {
-          for(each <- gameMap.squaresInRange(analyzeRecruit.get).filter(n => gameMap.contains(n))) {
-             g.setColor(Color.MAGENTA)
-             g.drawRect(each.x * scaleNum, each.y * scaleNum - scaleNum, 30, 30)
-          }
-        }
-
-        if(mousePoint.isDefined && gameMap.contains(mouseCoord(mousePoint.get))) {
-           if(purchaseCandidate.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
-              val gridPlace = gameMap(mouseCoord(mousePoint.get))
-              g.drawImage(getRecruitSprite(purchaseCandidate.get), gridPlace.x * scaleNum, gridPlace.y * scaleNum - scaleNum, null)
-           }
-        }
-
-        // RECRUIT STORE BASE
-        g.setColor(Color.darkGray)
-        g.fillRect(gameMap.width * scaleNum, 0, scaleNum * 4, gameMap.width * scaleNum - scaleNum)
-        g.setColor(Color.red)
-        g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, gameMap.width * scaleNum - scaleNum)
-        g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, scaleNum * 5)
-
-
-        val recStore = new RecruitStore
-        g.setColor(Color.white)
-        g.drawString("- NIGHT STAND -", gameMap.width * scaleNum, 15)
-        g.drawString(s"Player health: ${player.getHealth}", gameMap.width * scaleNum, scaleNum)
-        g.drawString(s"Player money: ${player.getMoney}", gameMap.width * scaleNum, scaleNum * 2)
-        g.drawString(s"Wave: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum * 3)
-        g.drawString(s"Waves left: ${game.getWavesLeft}", gameMap.width * scaleNum, scaleNum * 4)
-
-        def scaledWidth = gameMap.width * scaleNum
+  def drawRecruitStore(g: Graphics2D, analyzeRecruit: Option[Recruit]): Unit = {
         def recStoreCoords(row: Int): GridPos = GridPos(gameMap.width * scaleNum, scaleNum * (5 + row))
-
-        var first = true
         var row = 0
+        g.setColor(Color.DARK_GRAY)
+
+        g.fillRect(gameMap.width * scaleNum, 0, scaleNum * 4, scaleNum * gameMap.width - scaleNum)
         for(each <- recStore.getRecruits) {
+            if(!player.affordableRecruits.contains(each.getName)) g.setColor(Color.GRAY)
+            g.fillRect(gameMap.width * scaleNum, scaleNum * (5 + row), scaleNum * 4, scaleNum)
+
             g.setColor(Color.RED)
             g.drawRect(gameMap.width * scaleNum, scaleNum * (5 + row), scaleNum * 4, scaleNum)
 
@@ -304,12 +311,33 @@ object TowerDefenseGUI extends SimpleSwingApplication {
             g.drawString(s"${each.getCost} G", recStoreCoords(row).x + 40, recStoreCoords(row).y - 18)
             g.setFont(Font(Font.Serif, Font.Bold, (scaleNum * 3) / (scaleNum / 5 + each.getName.length / 2)))
             g.drawString(s"${each.getName}", recStoreCoords(row).x + 40, recStoreCoords(row).y - 5)
+            g.setColor(Color.DARK_GRAY)
         }
-    }
- }
+        g.setFont(Font(Font.Serif, Font.Plain, 12))
+        g.setColor(Color.white)
+        g.drawString("- NIGHT STAND -", gameMap.width * scaleNum, 15)
+        g.drawString(s"Player health: ${player.getHealth}", gameMap.width * scaleNum, scaleNum)
+        g.drawString(s"Player money: ${player.getMoney}", gameMap.width * scaleNum, scaleNum * 2)
+        g.drawString(s"Wave: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum * 3)
+        g.drawString(s"Waves left: ${game.getWavesLeft}", gameMap.width * scaleNum, scaleNum * 4)
 
- val recrStore = new BoxPanel(Orientation.Horizontal) {
-   contents += gridMap
- }
+        if(analyzeRecruit.isDefined) {
+          g.setColor(Color.WHITE)
+          g.setFont(Font(Font.Serif, Font.Plain, 12))
+          g.drawString(s"${analyzeRecruit.get.getName}", gameMap.width * scaleNum + 2, scaleNum * 15)
+          g.drawString(s"Range: ${analyzeRecruit.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 15 + scaleNum / 2)
+          g.drawString(s"Damage: ${analyzeRecruit.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 16)
+          analyzeRecruit.get match {
+            case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + scaleNum + 2, scaleNum * 16 + scaleNum / 2)
+            case _ =>
+          }
+          var num = 0
+          val desc = analyzeRecruit.get.getSeparatedDesc
+          for(each <- desc) {
+              g.drawString(s"${each}", gameMap.width * scaleNum + 2, scaleNum * 17 + (scaleNum / 2) * num)
+              num += 1
+          }
+        }
+  }
 }
 
