@@ -35,7 +35,7 @@ class Game(player: Player, waves: Array[Wave]) {
 
  private var enemyMoveCounter = 0
  private var spawnCounter = 0
- private var pause = false
+ private var pause = true
  private var done = false
 
  def continueGame() = pause = false

@@ -4,6 +4,7 @@ abstract class Recruit(name: String, description: String, strength: Int, range: 
 
   def getName = this.name
   def getDescription = this.description
+
   def getSeparatedDesc = {
      val splitted = this.description.split(" ").flatMap(_ +: " ")
      var addition = ""

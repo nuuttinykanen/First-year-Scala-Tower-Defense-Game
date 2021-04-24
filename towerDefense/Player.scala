@@ -20,7 +20,8 @@ class Player(health: Int, money: Int, map: LevelMap) {
  }
 
  def changeMoney(amount: Int)() = {
-   currentMoney += amount
+   if(currentMoney + amount < 0) currentMoney = 0
+   else currentMoney += amount
  }
 
  def affordableRecruits: Vector[String] = {

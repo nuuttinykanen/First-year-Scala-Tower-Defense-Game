@@ -1,6 +1,7 @@
 package towerDefense.gui
 import o1.grid.GridPos
 import towerDefense._
+
 import scala.util.Random
 import javax.imageio._
 import java.awt.{Color, Graphics2D, Image}
@@ -11,14 +12,13 @@ import java.io.File
 import javax.swing.UIManager
 import scala.swing.{Dimension, MainFrame, Point, SimpleSwingApplication}
 import scala.swing._
-import scala.swing.event.{MouseMoved, MouseReleased}
+import scala.swing.event.{MouseClicked, MouseMoved, MousePressed, MouseReleased}
 
 object TowerDefenseGUI extends SimpleSwingApplication {
   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
   formGame.readFile
 
   val game = formGame.processData
-  game.continueGame()
   def player = game.getPlayer
   def gameMap = game.getMap
 
@@ -29,7 +29,6 @@ object TowerDefenseGUI extends SimpleSwingApplication {
        gridMap.repaint()
        gameMap.removeTempModifiers()
        game.passTime()
-       if(game.isPaused) game.continueGame()
      }
   }
 
@@ -158,6 +157,16 @@ object TowerDefenseGUI extends SimpleSwingApplication {
     recruitRectangles.map(_._2).exists(n => n.contains(point.getX, point.getY))
  }
 
+ def posOnContinue(point: Point): Boolean = {
+  val rectangle = new Rectangle(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+  rectangle.contains(point)
+ }
+
+ def posOnUpgrade(point: Point): Boolean = {
+   val rectangle = new Rectangle(gameMap.width * scaleNum + 3, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+   rectangle.contains(point)
+ }
+
  def getStoreRecruit(point: Point): Recruit = {
    val recruit = recruitRectangles.find(_._2.getBounds.contains(point.getX, point.getY))
    if(recruit.isDefined) {
@@ -174,18 +183,28 @@ object TowerDefenseGUI extends SimpleSwingApplication {
       var analyzeRecruit: Option[Recruit] = None
       var purchaseCandidate: Option[Recruit] = None
       var mousePoint: Option[Point] = None
+      var mouseJustPressed = false
 
       override def paintComponent(g: Graphics2D) = {
        listenTo(mouse.moves)
        listenTo(mouse.clicks)
 
        reactions += {
-         case MouseReleased(source, point, modifiers, clicks, triggersPopup) => {
-           if(posOnStore(point)) {
-             purchaseCandidate = Some(getStoreRecruit(point))
+         case MousePressed(source, point, modifiers, clicks, triggersPopup) => {
+           if(mouseJustPressed) {
            }
-           else if(gameMap.contains(mouseCoord(mousePoint.get))) {
-             if(purchaseCandidate.isDefined && mousePoint.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
+           else {
+             if(posOnContinue(point) && game.isPaused) {
+              game.continueGame()
+             }
+             else if(posOnUpgrade(point) && analyzeRecruit.isDefined && analyzeRecruit.get.getUpgrade.isDefined) {
+               player.upgradeRecruit(analyzeRecruit.get)()
+             }
+             else if(posOnStore(point)) {
+               purchaseCandidate = Some(getStoreRecruit(point))
+             }
+             else if(gameMap.contains(mouseCoord(mousePoint.get))) {
+              if(purchaseCandidate.isDefined && mousePoint.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
                player.hireRecruit(purchaseCandidate.get, new MapSquare(mouseCoord(mousePoint.get).x, mouseCoord(mousePoint.get).y))
                purchaseCandidate = None
              }
@@ -197,13 +216,17 @@ object TowerDefenseGUI extends SimpleSwingApplication {
            else {
              purchaseCandidate = None
            }
+             mouseJustPressed = true
+           }
         }
+        case MouseReleased(c, point, mods, x, y) => mouseJustPressed = false
         case MouseMoved(c, point, mods) => {
            this.mousePoint = Some(point)
          }
       }
 
         drawMap(g)
+
 
         for(each <- gameMap.getProjectiles.map(_.getLocation)) {
            g.setColor(Color.BLACK)
@@ -346,9 +369,40 @@ object TowerDefenseGUI extends SimpleSwingApplication {
               case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + 2, scaleNum * 16)
               case _ =>
             }
-          }
-          // CREATE UPGRADE / SELL BOX
+            if(upgrade.getCost > player.getMoney) g.setColor(Color.LIGHT_GRAY)
+            else g.setColor(Color.GREEN)
+            g.fillRect(gameMap.width * scaleNum + 3, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+
+            g.setColor(Color.WHITE)
+              g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 3))
+            g.drawString("UPGRADE", gameMap.width * scaleNum + 5, scaleNum * 18)
+              g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
+            g.drawString(s"${upgrade.getCost} G", gameMap.width * scaleNum + scaleNum / 2 + 2, scaleNum * 18 + scaleNum / 2)
+       }
+      }
+       if(game.isPaused) {
+        g.setColor(Color.GREEN)
+            g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+              g.setColor(Color.WHITE)
+            g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
+            g.drawString("START", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
+            g.drawString("WAVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18 + scaleNum / 2)
+
+     }
+     else {
+        g.setColor(Color.darkGray)
+       g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+       g.setColor(Color.WHITE)
+       g.drawString("SURVIVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
     }
+
+     g.setColor(Color.BLACK)
+     g.drawRect(gameMap.width * scaleNum, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+
+       g.drawRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2, scaleNum * 4, scaleNum / 2)
+       g.drawRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+
+
   }
 }
 
