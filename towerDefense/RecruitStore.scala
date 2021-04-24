@@ -14,8 +14,4 @@ class RecruitStore {
 
   def getCosts = getRecruits.map(_.getCost)
 
-  def addRecruit(tower: Recruit) = recruits += tower
-
-  def removeRecruit(tower: Recruit) = recruits -= tower
-
 }

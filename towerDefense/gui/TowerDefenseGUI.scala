@@ -37,17 +37,15 @@ object TowerDefenseGUI extends SimpleSwingApplication {
   val timer = new javax.swing.Timer(1, listener)
   timer.start()
 
- // val michaelSprite = ImageIO.read(new File("towerDefense/graphics/michaelmyers.png"))
- //  var enemySprites: scala.collection.mutable.Map[String, BufferedImage] = Map("MichaelMyers" -> michaelSprite)
-
   def scaleNum = 30
 
   def top = new MainFrame {
     title = "Lunar Resistance"
     contents = gridMap
     size = new Dimension(gameMap.width * scaleNum, gameMap.width * scaleNum)
-    minimumSize = new Dimension(gameMap.width * 10, gameMap.width * 10)
+    minimumSize = new Dimension(scaleNum, scaleNum)
   }
+
 
   def getSprite(spriteName: String): BufferedImage = ImageIO.read(new File("towerDefense/graphics/" + spriteName + ".png"))
 
@@ -76,7 +74,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   val recruitSprites: scala.Vector[BufferedImage] = {
      var returnList = collection.mutable.Buffer[BufferedImage]()
-     val recruitList = scala.Vector("simon", "vanHelsing", "ash", "chainsawAsh", "macready", "venkman", "suzy", "fathermerrin", "laurie")
+     val recruitList = scala.Vector("suzy", "dancerSuzy", "simon", "vampKillerSimon", "vanHelsing", "slayerHelsing", "ash", "chainsawAsh", "macready", "flameRJ", "infernoRJ", "venkman", "captVenkman", "hunterVenkman", "fatherMerrin", "enlightenedMerrin", "lightkeeperMerrin", "drFrankenstein", "madDr", "insaneDr")
      for(each <- recruitList) {
         returnList += getSprite(each)
      }
@@ -86,16 +84,27 @@ object TowerDefenseGUI extends SimpleSwingApplication {
   def getRecruitSprite(recruit: Recruit) = {
     val index = {
       recruit match {
-       case some: Simon => 0
-       case some: VanHelsing => 1
-       case some: Ash => 2
-       case some: ChainsawAsh => 3
-       case some: MacReady => 4
-       case some: Venkman => 5
-       case some: Suzy => 6
-       case some: FatherMerrin => 7
-       case some: DrFrankenstein => 8
-       case _ => 0
+        case some: Suzy => 0
+        case some: DancerSuzy => 1
+        case some: Simon => 2
+        case some: VampKillerSimon => 3
+        case some: VanHelsing => 4
+        case some: SlayerHelsing => 5
+        case some: Ash => 6
+        case some: ChainsawAsh => 7
+        case some: MacReady => 8
+        case some: FlameRJ => 9
+        case some: InfernoRJ => 10
+        case some: Venkman => 11
+        case some: CaptVenkman => 12
+        case some: HunterVenkman => 13
+        case some: FatherMerrin => 14
+        case some: EnlightenedMerrin => 15
+        case some: LightkeeperMerrin => 16
+        case some: DrFrankenstein => 17
+        case some: MadDrFrankenstein => 18
+        case some: InsaneDrFrankenstein => 19
+        case _ => 0
       }
     }
     recruitSprites(index).getScaledInstance(scaleNum, scaleNum, Image.SCALE_DEFAULT)
@@ -165,6 +174,11 @@ object TowerDefenseGUI extends SimpleSwingApplication {
    rectangle.contains(point)
  }
 
+ def posOnSell(point: Point): Boolean = {
+   val rectangle = new Rectangle(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
+   rectangle.contains(point)
+ }
+
  def getStoreRecruit(point: Point): Recruit = {
    val recruit = recruitRectangles.find(_._2.getBounds.contains(point.getX, point.getY))
    if(recruit.isDefined) {
@@ -194,6 +208,10 @@ object TowerDefenseGUI extends SimpleSwingApplication {
            else {
              if(posOnContinue(point) && game.isPaused) {
               game.continueGame()
+             }
+             else if(posOnSell(point) && analyzeRecruit.nonEmpty && gameMap.getRecruits.contains(analyzeRecruit.get)) {
+               player.sellRecruit(analyzeRecruit.get)()
+               analyzeRecruit = None
              }
              else if(posOnUpgrade(point) && analyzeRecruit.isDefined && gameMap.getRecruits.contains(analyzeRecruit.get) && analyzeRecruit.get.getUpgrade.isDefined) {
                player.upgradeRecruit(analyzeRecruit.get)() match {
@@ -268,10 +286,6 @@ object TowerDefenseGUI extends SimpleSwingApplication {
     }
  }
 
- val recrStore = new BoxPanel(Orientation.Horizontal) {
-   contents += gridMap
- }
-
   def drawMap(g: Graphics2D) = {
        g.setColor(Color.gray)
        g.fillRect(0, 0, gameMap.width * scaleNum, gameMap.width * scaleNum - scaleNum)
@@ -333,13 +347,13 @@ object TowerDefenseGUI extends SimpleSwingApplication {
             g.setColor(Color.DARK_GRAY)
         }
 
-        g.setFont(Font(Font.Serif, Font.Plain, 12))
+        g.setFont(Font(Font.Serif, Font.Bold, 10))
         g.setColor(Color.WHITE)
-        g.drawString("- NIGHT STAND -",                     gameMap.width * scaleNum, 15)
-        g.drawString(s"HEALTH: ${player.getHealth}", gameMap.width * scaleNum, scaleNum)
-        g.drawString(s"MONEY: ${player.getMoney}",   gameMap.width * scaleNum, scaleNum + scaleNum / 3)
-        g.drawString(s"WAVE: ${game.getWaveNumber}",        gameMap.width * scaleNum, scaleNum + scaleNum * 2 / 3)
-        g.drawString(s"WAVES LEFT: ${game.getWavesLeft}",   gameMap.width * scaleNum, scaleNum * 2)
+        g.drawString(s"WAVE: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum / 2)
+        g.drawString(s"WAVES LEFT: ${game.getWavesLeft}",   gameMap.width * scaleNum, scaleNum / 2 + scaleNum / 3)
+        g.drawString(s"HEALTH: ${player.getHealth}",        gameMap.width * scaleNum, scaleNum + scaleNum / 4)
+        g.drawString(s"MONEY: ${player.getMoney}",   gameMap.width * scaleNum, scaleNum + 2 * scaleNum / 3)
+
 
         if(analyzeRecruit.isDefined) {
           g.setColor(Color.WHITE)
@@ -359,9 +373,18 @@ object TowerDefenseGUI extends SimpleSwingApplication {
               g.drawString(s"${each}", gameMap.width * scaleNum + 2, scaleNum * 12 + (scaleNum / 2) * num)
               num += 1
           }
+
+          // SELL BOX
+          g.setColor(Color.YELLOW)
+          g.fillRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
+          g.setColor(Color.BLACK)
+          g.setFont(Font(Font.Serif, Font.Bold, 13))
+          g.drawString(s"SELL FOR ${analyzeRecruit.get.getSellPrice} G", gameMap.width * scaleNum + scaleNum / 2, scaleNum * 17 - scaleNum / 4)
+
           if(analyzeRecruit.get.getUpgrade.isDefined) {
             val upgrade = analyzeRecruit.get.getUpgrade.get
              g.setFont(Font(Font.Serif, Font.Bold, 11))
+             g.setColor(Color.WHITE)
             g.drawString(s"Upgrade to", gameMap.width * scaleNum + 2, scaleNum * 14)
              g.setFont(Font(Font.Serif, Font.Plain, 11))
             g.drawString(s"${upgrade.getName}", gameMap.width * scaleNum, scaleNum * 14 + scaleNum / 2)
@@ -395,14 +418,14 @@ object TowerDefenseGUI extends SimpleSwingApplication {
         g.setColor(Color.darkGray)
        g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
        g.setColor(Color.WHITE)
-         g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 4))
+         g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 3))
        g.drawString("SURVIVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
     }
 
       g.setColor(Color.BLACK)
       g.drawRect(gameMap.width * scaleNum, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
 
-       g.drawRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2, scaleNum * 4, scaleNum / 2)
+       g.drawRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
        g.drawRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
 
 

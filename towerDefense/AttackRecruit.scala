@@ -34,11 +34,18 @@ abstract class AttackRecruit(name: String, description: String, strength: Int, r
 
 }
 
-class Suzy extends        AttackRecruit("Suzy Bannion",      "",  4, 2, 2, 200,                  None)
-class Simon extends       AttackRecruit("Simon Belmont",     "",  5, 3, 2, 300,                  None)
-class VanHelsing extends  AttackRecruit("Van Helsing",       "",  8, 5, 3, 600,                  None)
+class Suzy extends        AttackRecruit("Suzy Bannion",      "",  4, 2, 2, 200,                  Some(new DancerSuzy))
+class DancerSuzy extends AttackRecruit("Suzy, Dancer of the Dark", "", 6, 3, 2, 450,             None)
+class Simon extends       AttackRecruit("Simon Belmont",     "",  5, 3, 2, 300,                  Some(new VampKillerSimon))
+class VampKillerSimon extends AttackRecruit("Vampire Killer Simon", "", 7, 3, 2, 500,                None)
+class VanHelsing extends  AttackRecruit("Van Helsing",       "",  8, 5, 3, 600,                  Some(new SlayerHelsing))
+class SlayerHelsing extends AttackRecruit("Vampire Slayer Helsing", "", 10, 7, 3, 900,           None)
 class Ash extends         AttackRecruit("Ash",               "", 12, 2, 3, 800, Some(new ChainsawAsh))
-class ChainsawAsh extends AttackRecruit("Ash with Chainsaw", "", 20, 3, 3, 700,                  None)
-class MacReady extends    AttackRecruit("R.J.",              "", 10, 3, 5, 450,                  None)
-class Venkman extends     AttackRecruit("Dr. Venkman",       "", 12, 4, 6, 650,                  None)
+class ChainsawAsh extends AttackRecruit("Ash with Chainsaw", "", 22, 3, 3, 1400,                 None)
+class MacReady extends    AttackRecruit("R.J.",              "", 10, 3, 5, 450,     Some(new FlameRJ))
+class FlameRJ extends     AttackRecruit("Flameburster R.J.", "", 13, 3, 4, 400,   Some(new InfernoRJ))
+class InfernoRJ extends   AttackRecruit("Inferno R.J.",      "", 16, 4, 4, 550,                  None)
+class Venkman extends     AttackRecruit("Dr. Venkman",       "", 12, 4, 6, 650,                  Some(new CaptVenkman))
+class CaptVenkman extends AttackRecruit("Ghost Capturer Venkman", "", 14, 5, 6, 700,             Some(new HunterVenkman))
+class HunterVenkman extends AttackRecruit("Ghost Hunter Venkman", "", 15, 5, 4, 750,              None)
 

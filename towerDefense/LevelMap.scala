@@ -2,6 +2,7 @@ package towerDefense
 
 import o1.grid._
 
+import java.io.IOException
 import scala.collection.mutable.Buffer
 import scala.math.abs
 class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
@@ -176,10 +177,16 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   def matchRecruit(recruit: Recruit) = {
     recruit match {
       case some: Simon => new Simon
+      case some: VampKillerSimon => new VampKillerSimon
       case some: VanHelsing => new VanHelsing
+      case some: SlayerHelsing => new SlayerHelsing
       case some: Ash => new Ash
       case some: ChainsawAsh => new ChainsawAsh
       case some: MacReady => new MacReady
+      case some: FlameRJ => new FlameRJ
+      case some: InfernoRJ => new InfernoRJ
+      case some: CaptVenkman => new CaptVenkman
+      case some: HunterVenkman => new HunterVenkman
       case some: Venkman => new Venkman
       case some: Suzy => new Suzy
       case some: FatherMerrin => new FatherMerrin
@@ -188,7 +195,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
       case some: DrFrankenstein => new DrFrankenstein
       case some: MadDrFrankenstein => new MadDrFrankenstein
       case some: InsaneDrFrankenstein => new InsaneDrFrankenstein
-      case _ => new Simon
+      case _ => throw new IOException("Failed to find upgrade for recruit!")
       }
   }
 

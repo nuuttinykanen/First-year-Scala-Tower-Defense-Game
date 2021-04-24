@@ -41,9 +41,11 @@ class Player(health: Int, money: Int, map: LevelMap) {
    }
    else "You can't afford that recruit."
  }
+
  def sellRecruit(recruit: Recruit)() =  {
    val returnPrice = recruit.getSellPrice
    this.changeMoney(returnPrice)()
+   this.map.removeRecruit(recruit.getLocation)
  }
 
  def upgradeRecruit(recruit: Recruit)() = {
