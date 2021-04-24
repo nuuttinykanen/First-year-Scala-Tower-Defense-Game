@@ -4,7 +4,7 @@ abstract class SupportRecruit(name: String, description: String, strength: Int, 
    def supportEffect(square: MapSquare): Unit
 }
 
-class FatherMerrin extends SupportRecruit("Father Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 3, 1, Some(new EnlightenedMerrin)) {
+class FatherMerrin extends SupportRecruit("Father Merrin", s"Reduces the countdown of every recruit in its range by strength.", 1, 1, 1, Some(new EnlightenedMerrin)) {
 
   def supportEffect(square: MapSquare): Unit = {
     square match {
@@ -20,13 +20,13 @@ class FatherMerrin extends SupportRecruit("Father Merrin", s"Reduces the countdo
 
 }
 
-class EnlightenedMerrin extends SupportRecruit("Enlightened Merrin", s"Reduces the countdown of every recruit in its range by strength.", 3, 5, 1, Some(new LightkeeperMerrin)) {
+class EnlightenedMerrin extends SupportRecruit("Enlightened Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 1, 1, Some(new LightkeeperMerrin)) {
 
   def supportEffect(square: MapSquare): Unit = {
     square match {
       case attSquare: RecruitSquare => {
          attSquare.getRecruit match {
-           case attRecruit: AttackRecruit => attRecruit.addCooldownModifier(-4)
+           case attRecruit: AttackRecruit => attRecruit.addCooldownModifier(-1 * getStrength)
            case _ =>
          }
       }
@@ -35,13 +35,13 @@ class EnlightenedMerrin extends SupportRecruit("Enlightened Merrin", s"Reduces t
   }
 }
 
-class LightkeeperMerrin extends SupportRecruit("Lightkeeper Merrin", s"Reduces the countdown of every recruit in its range by strength.", 5, 6, 1, None) {
+class LightkeeperMerrin extends SupportRecruit("Lightkeeper Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 2, 1, None) {
 
   def supportEffect(square: MapSquare): Unit = {
     square match {
       case attSquare: RecruitSquare => {
          attSquare.getRecruit match {
-           case attRecruit: AttackRecruit => attRecruit.addCooldownModifier(-6)
+           case attRecruit: AttackRecruit => attRecruit.addCooldownModifier(-1 * getStrength)
            case _ =>
          }
       }

@@ -56,7 +56,7 @@ def passTime() = {
    gameMap.getSupportRecruits.foreach(n => gameMap.supportAura(n))
    gameMap.getAttackRecruits.foreach(n => gameMap.attack(n))
 
-   if(enemyMoveCounter > 2) {
+   if(enemyMoveCounter > 1) {
       this.gameMap.moveEnemies()
       enemyMoveCounter = 0
    }

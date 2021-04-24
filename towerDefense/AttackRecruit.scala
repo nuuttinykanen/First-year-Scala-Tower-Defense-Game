@@ -25,18 +25,12 @@ abstract class AttackRecruit(name: String, description: String, strength: Int, r
   override def getRange = this.currentRange
 
   def addCooldownModifier(amount: Int) = this.cooldownModifiers += amount
-  def addStrengthModifier(amount: Int) = this.strengthModifiers += amount
   def addRangeModifier(amount: Int) = this.rangeModifiers += amount
 
   def removeModifiers() = {
     cooldownModifiers = 0
-    strengthModifiers = 0
     rangeModifiers = 0
   }
-
-  var strengthModifiers = 0
-
-  var currentStrength = this.strength + this.strengthModifiers
 
 }
 
