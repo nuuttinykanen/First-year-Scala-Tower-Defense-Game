@@ -45,9 +45,9 @@ class Game(player: Player, waves: Array[Wave]) {
  def isDone: Boolean = this.done
 
 def passTime() = {
-  if(this.getPlayer.getHealth <= 0) endGame()
+  if(this.getPlayer.isDead) endGame()
   if(isPaused) {
-     println("isPaused")
+    gameMap.getSupportRecruits.foreach(n => gameMap.supportAura(n))
   }
   else {
    if(gameMap.getProjectiles.nonEmpty) gameMap.getProjectiles.foreach(n => if(n != null) n.move(2))

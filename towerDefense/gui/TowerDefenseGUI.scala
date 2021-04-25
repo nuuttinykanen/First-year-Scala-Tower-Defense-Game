@@ -22,8 +22,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
   def player = game.getPlayer
   def gameMap = game.getMap
 
-
-
+  val recStore = new RecruitStore
   val gen = new Random()
 
 
@@ -146,8 +145,6 @@ object TowerDefenseGUI extends SimpleSwingApplication {
      projecSprites(index).getScaledInstance(scaleNum, scaleNum, Image.SCALE_DEFAULT)
   }
 
- val recStore = new RecruitStore
-
  val recruitRectangles = {
     var recruitBuffer = scala.collection.mutable.Buffer[Recruit]()
     var rectBuffer = scala.collection.mutable.Buffer[Rectangle2D]()
@@ -190,7 +187,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
  def mouseCoord(coord: Point): GridPos = GridPos(coord.getX.toInt / scaleNum, (coord.getY.toInt + scaleNum) / scaleNum)
 
- val gridMap = new Component {
+ val gridMap: Component = new Component {
 
       var color = Color.black
       var analyzeRecruit: Option[Recruit] = None
@@ -281,9 +278,12 @@ object TowerDefenseGUI extends SimpleSwingApplication {
         g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, gameMap.width * scaleNum - scaleNum)
         g.drawRect(gameMap.width * scaleNum, 0, scaleNum * 4, scaleNum * 5)
 
-        val recStore = new RecruitStore
-
         drawRecruitStore(g: Graphics2D, analyzeRecruit)
+        if(game.isDone) {
+          if(player.isDead) gameOverMessage(g)()
+          else winMessage(g)()
+          timer.stop()
+        }
     }
  }
 
@@ -348,89 +348,110 @@ object TowerDefenseGUI extends SimpleSwingApplication {
             g.setColor(Color.DARK_GRAY)
         }
 
-        g.setFont(Font(Font.Serif, Font.Bold, 10))
-        g.setColor(Color.WHITE)
-        g.drawString(s"WAVE: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum / 2)
-        g.drawString(s"WAVES LEFT: ${game.getWavesLeft}",   gameMap.width * scaleNum, scaleNum / 2 + scaleNum / 3)
-        g.drawString(s"HEALTH: ${player.getHealth}",        gameMap.width * scaleNum, scaleNum + scaleNum / 4)
-        g.drawString(s"MONEY: ${player.getMoney}",   gameMap.width * scaleNum, scaleNum + 2 * scaleNum / 3)
+       drawInfo(g)()
+       if(analyzeRecruit.isDefined) {
+         drawAnalyzeInfo(g, analyzeRecruit)()
+         drawSellBox(g, analyzeRecruit)()
+         drawUpgradeInfo(g, analyzeRecruit)()
+       }
 
+    drawStartButton(g)()
 
-        if(analyzeRecruit.isDefined) {
+    g.setColor(Color.BLACK)
+    g.drawRect(gameMap.width * scaleNum, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+
+    g.drawRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
+    g.drawRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+  }
+
+ def drawInfo(g: Graphics2D)() = {
+    g.setFont(Font(Font.Serif, Font.Bold, 10))
+    g.setColor(Color.WHITE)
+      g.drawString(s"WAVE: ${game.getWaveNumber}", gameMap.width * scaleNum, scaleNum / 2)
+      g.drawString(s"WAVES LEFT: ${game.getWavesLeft}",   gameMap.width * scaleNum, scaleNum / 2 + scaleNum / 3)
+      g.drawString(s"HEALTH: ${player.getHealth}",        gameMap.width * scaleNum, scaleNum + scaleNum / 4)
+      g.drawString(s"MONEY: ${player.getMoney}",   gameMap.width * scaleNum, scaleNum + 2 * scaleNum / 3)
+
+ }
+
+ def drawAnalyzeInfo(g: Graphics2D, analyzeRec: Option[Recruit])() = {
+      if(analyzeRec.isDefined) {
           g.setColor(Color.WHITE)
             g.setFont(Font(Font.Serif, Font.BoldItalic, 12))
-          g.drawString(s"${analyzeRecruit.get.getName}", gameMap.width * scaleNum + 2, scaleNum * 11 - scaleNum / 2)
+          g.drawString(s"${analyzeRec.get.getName}", gameMap.width * scaleNum + 2, scaleNum * 11 - scaleNum / 2)
             g.setFont(Font(Font.Serif, Font.Plain, 11))
-          g.drawString(s"Range: ${analyzeRecruit.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 11)
-          g.drawString(s"Strength: ${analyzeRecruit.get.getStrength}", gameMap.width * scaleNum + 2, scaleNum * 11 + scaleNum / 2)
-          analyzeRecruit.get match {
+          g.drawString(s"Range: ${analyzeRec.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 11)
+          g.drawString(s"Strength: ${analyzeRec.get.getStrength}", gameMap.width * scaleNum + 2, scaleNum * 11 + scaleNum / 2)
+          analyzeRec.get match {
             case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + 2, scaleNum * 12)
             case _ =>
           }
           var num = 0
-          val desc = analyzeRecruit.get.getSeparatedDesc
+          val desc = analyzeRec.get.getSeparatedDesc
           for(each <- desc) {
                 g.setFont(Font(Font.Serif, Font.Plain, 9))
               g.drawString(s"${each}", gameMap.width * scaleNum + 2, scaleNum * 12 + (scaleNum / 2) * num)
               num += 1
           }
+      }
+ }
 
-          // SELL BOX
-          g.setColor(Color.YELLOW)
-          g.fillRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
-          g.setColor(Color.BLACK)
-          g.setFont(Font(Font.Serif, Font.Bold, 13))
-          g.drawString(s"SELL FOR ${analyzeRecruit.get.getSellPrice} G", gameMap.width * scaleNum + scaleNum / 2, scaleNum * 17 - scaleNum / 4)
+ def drawSellBox(g: Graphics2D, analyzeRec: Option[Recruit])() = {
+       g.setColor(Color.YELLOW)
+       g.fillRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
+       g.setColor(Color.BLACK)
+       g.setFont(Font(Font.Serif, Font.Bold, 13))
+       g.drawString(s"SELL FOR ${analyzeRec.get.getSellPrice} G", gameMap.width * scaleNum + scaleNum / 2, scaleNum * 17 - scaleNum / 4)
+ }
 
-          if(analyzeRecruit.get.getUpgrade.isDefined) {
-            val upgrade = analyzeRecruit.get.getUpgrade.get
+ def drawUpgradeInfo(g: Graphics2D, analyzeRec: Option[Recruit])() = {
+      if(analyzeRec.get.getUpgrade.isDefined) {
+         val upgrade = analyzeRec.get.getUpgrade.get
              g.setFont(Font(Font.Serif, Font.Bold, 11))
-             g.setColor(Color.WHITE)
-            g.drawString(s"Upgrade to", gameMap.width * scaleNum + 2, scaleNum * 14)
+          g.setColor(Color.WHITE)
+          g.drawString(s"Upgrade to", gameMap.width * scaleNum + 2, scaleNum * 14)
              g.setFont(Font(Font.Serif, Font.Plain, 11))
-            g.drawString(s"${upgrade.getName}", gameMap.width * scaleNum, scaleNum * 14 + scaleNum / 2)
-            g.drawString(s"Range: ${upgrade.getRange}", gameMap.width * scaleNum + 2, scaleNum * 15)
-            g.drawString(s"Strength: ${upgrade.getStrength}", gameMap.width * scaleNum + 2, scaleNum * 15 + scaleNum / 2)
-            upgrade match {
+          g.drawString(s"${upgrade.getName}", gameMap.width * scaleNum, scaleNum * 14 + scaleNum / 2)
+          g.drawString(s"Range: ${upgrade.getRange}", gameMap.width * scaleNum + 2, scaleNum * 15)
+          g.drawString(s"Strength: ${upgrade.getStrength}", gameMap.width * scaleNum + 2, scaleNum * 15 + scaleNum / 2)
+
+          upgrade match {
               case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + 2, scaleNum * 16)
               case _ =>
             }
-            if(upgrade.getCost > player.getMoney) g.setColor(Color.LIGHT_GRAY)
-            else g.setColor(Color.GREEN)
-            g.fillRect(gameMap.width * scaleNum, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
 
-            g.setColor(Color.WHITE)
-              g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 3))
-            g.drawString("UPGRADE", gameMap.width * scaleNum + 5, scaleNum * 18)
-              g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
-            g.drawString(s"${upgrade.getCost} G", gameMap.width * scaleNum + scaleNum / 2 + 2, scaleNum * 18 + scaleNum / 2)
+          if(upgrade.getCost > player.getMoney) g.setColor(Color.LIGHT_GRAY)
+          else g.setColor(Color.GREEN)
+           g.fillRect(gameMap.width * scaleNum, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+
+           g.setColor(Color.WHITE)
+             g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 3))
+           g.drawString("UPGRADE", gameMap.width * scaleNum + 5, scaleNum * 18)
+             g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
+           g.drawString(s"${upgrade.getCost} G", gameMap.width * scaleNum + scaleNum / 3, scaleNum * 18 + scaleNum / 2)
        }
-      }
-       if(game.isPaused) {
+ }
+
+ def drawStartButton(g: Graphics2D)() = {
+    if(game.isPaused) {
         g.setColor(Color.GREEN)
-            g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
-              g.setColor(Color.WHITE)
+              g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+            g.setColor(Color.WHITE)
             g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
-            g.drawString("START", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
-            g.drawString("WAVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18 + scaleNum / 2)
-
-     }
-     else {
-        g.setColor(Color.darkGray)
-       g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
-       g.setColor(Color.WHITE)
-         g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 3))
-       g.drawString("SURVIVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
+              g.drawString("START", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
+              g.drawString("WAVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18 + scaleNum / 2)
     }
+    else {
+       g.setColor(Color.darkGray)
+         g.fillRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+       g.setColor(Color.WHITE)
+       g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
+         g.drawString("SURVIVE", gameMap.width * scaleNum + (scaleNum * 2) + 3, scaleNum * 18)
+    }
+ }
 
-      g.setColor(Color.BLACK)
-      g.drawRect(gameMap.width * scaleNum, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
-
-       g.drawRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
-       g.drawRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
-
-    if(game.isDone) {
-        g.setColor(Color.RED)
+ def gameOverMessage(g: Graphics2D)() = {
+          g.setColor(Color.RED)
         g.fillRect((scaleNum * gameMap.width) / 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - (scaleNum * 3), scaleNum * 6, scaleNum * 6)
         g.setColor(Color.BLACK)
         g.drawRect((scaleNum * gameMap.width) / 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - (scaleNum * 3), scaleNum * 6, scaleNum * 6)
@@ -438,11 +459,19 @@ object TowerDefenseGUI extends SimpleSwingApplication {
         g.drawString("YOU LOST.", (scaleNum * gameMap.width) / 2 - (scaleNum * 2), scaleNum * gameMap.width / 2 - scaleNum)
         g.drawString("THE MONSTERS", (scaleNum * gameMap.width) / 2 - (scaleNum * 2), scaleNum * gameMap.width / 2)
         g.drawString("PREVAIL.", (scaleNum * gameMap.width) / 2 - (scaleNum * 2), scaleNum * gameMap.width / 2 + scaleNum)
+ }
 
-        timer.stop()
-    }
+ def winMessage(g: Graphics2D)() = {
+          g.setColor(Color.GREEN)
+        g.fillRect((scaleNum * gameMap.width) / 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - (scaleNum * 3), scaleNum * 6, scaleNum * 6)
+          g.setColor(Color.BLACK)
+        g.drawRect((scaleNum * gameMap.width) / 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - (scaleNum * 3), scaleNum * 6, scaleNum * 6)
+            g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
+        g.drawString("YOU WON.", (scaleNum * gameMap.width) / 2 + 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - scaleNum)
+        g.drawString("NOW REST AND SEE", (scaleNum * gameMap.width) / 2 + 2 - (scaleNum * 3), scaleNum * gameMap.width / 2)
+        g.drawString("A NEW DAY RISE.", (scaleNum * gameMap.width) / 2  + 2- (scaleNum * 3), scaleNum * gameMap.width / 2 + scaleNum)
+ }
 
 
-  }
 }
 
