@@ -9,7 +9,7 @@ import java.awt.event.ActionListener
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.io.File
-import javax.swing.UIManager
+import javax.swing.{JTextArea, UIManager}
 import scala.swing.{Dimension, MainFrame, Point, SimpleSwingApplication}
 import scala.swing._
 import scala.swing.event.{MouseClicked, MouseMoved, MousePressed, MouseReleased}
@@ -26,6 +26,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   val gen = new Random()
 
+
   val listener = new ActionListener() {
      def actionPerformed(e: java.awt.event.ActionEvent) = {
        gameMap.removeTempModifiers()
@@ -34,7 +35,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
      }
   }
 
-  val timer = new javax.swing.Timer(1, listener)
+  val timer = new javax.swing.Timer(30, listener)
   timer.start()
 
   def scaleNum = 30
@@ -427,6 +428,19 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
        g.drawRect(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
        g.drawRect(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
+
+    if(game.isDone) {
+        g.setColor(Color.RED)
+        g.fillRect((scaleNum * gameMap.width) / 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - (scaleNum * 3), scaleNum * 6, scaleNum * 6)
+        g.setColor(Color.BLACK)
+        g.drawRect((scaleNum * gameMap.width) / 2 - (scaleNum * 3), scaleNum * gameMap.width / 2 - (scaleNum * 3), scaleNum * 6, scaleNum * 6)
+            g.setFont(Font(Font.Serif, Font.Bold, scaleNum / 2))
+        g.drawString("YOU LOST.", (scaleNum * gameMap.width) / 2 - (scaleNum * 2), scaleNum * gameMap.width / 2 - scaleNum)
+        g.drawString("THE MONSTERS", (scaleNum * gameMap.width) / 2 - (scaleNum * 2), scaleNum * gameMap.width / 2)
+        g.drawString("PREVAIL.", (scaleNum * gameMap.width) / 2 - (scaleNum * 2), scaleNum * gameMap.width / 2 + scaleNum)
+
+        timer.stop()
+    }
 
 
   }

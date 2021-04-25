@@ -1,6 +1,6 @@
 package towerDefense
-
 import scala.collection.mutable.Buffer
+
 class RecruitStore {
 
   // Towers that are available to purchase during the game.
@@ -13,5 +13,4 @@ class RecruitStore {
   def getRecruits: Vector[Recruit] = recruits.toVector
 
   def getCosts = getRecruits.map(_.getCost)
-
 }
