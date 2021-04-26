@@ -23,8 +23,8 @@ class Game(player: Player, waves: Array[Wave]) {
  def endWave() = {
    pauseGame()
    waveList = waveList.drop(1)
-   println("\n\nWAVE END\n\n")
    if(waveList.nonEmpty) {
+      player.changeMoney(waveNumber * 50)()
       waveNumber += 1
       wave = this.waveList.head
    }

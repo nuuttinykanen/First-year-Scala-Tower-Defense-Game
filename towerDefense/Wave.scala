@@ -37,7 +37,7 @@ class Wave(enemyMap: Map[Enemy, Int]) {
      this.removeEnemy(output)
      output match {
        case some: Zombie         => output = new Zombie
-       case some: ZombieCarriage => output = new ZombieCarriage
+       case some: ZombieHorde => output = new ZombieHorde
        case some: MichaelMyers   => output = new MichaelMyers
        case some: Dracula        => output = new Dracula
        case some: Bat            => output = new Bat

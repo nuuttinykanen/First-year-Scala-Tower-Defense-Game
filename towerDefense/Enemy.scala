@@ -22,13 +22,13 @@ def getInnerEnemy = this.innerEnemy
 def getName = this.getClass.toString.drop(5).trim
 }
 
-class Zombie extends Enemy(8, 1, 15, None)
+class Zombie extends Enemy(4, 1, 10, None)
 
-class ZombieCarriage extends Enemy(16, 3, 40, Some(new Zombie))
+class ZombieHorde extends Enemy(13, 3, 30, Some(new Zombie))
 
-class MichaelMyers extends Enemy(100, 10, 150, None)
+class MichaelMyers extends Enemy(110, 10, 90, None)
 
-class Dracula extends Enemy(200, 10, 200, None)
+class Dracula extends Enemy(200, 10, 400, None)
 
 class Bat extends Enemy(4, 10, 2, Some(new Dracula))
 

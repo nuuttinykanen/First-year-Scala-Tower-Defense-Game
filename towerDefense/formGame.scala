@@ -46,6 +46,7 @@ object formGame {
       case _ => throw new IOException()
     }
 
+    // GET ENEMY WAVES FROM TEXT
     text = text.drop(1)
     for (each <- text.tail) {
       var waveNumbers = collection.mutable.Buffer[Int]()
@@ -102,7 +103,7 @@ object formGame {
       var amount = each.tail.toInt
       each.take(1) match {
         case "Z" => newEnemy = new Zombie
-        case "C" => newEnemy = new ZombieCarriage
+        case "C" => newEnemy = new ZombieHorde
         case "M" => newEnemy = new MichaelMyers
         case "D" => newEnemy = new Dracula
         case "B" => newEnemy = new Bat
@@ -145,6 +146,7 @@ object formGame {
     var coordList = mutable.Buffer[GridPos]()
     val tuples = coords.map(_.split(':').map(n => ((n.split(',').head.toInt, n.split(',').last.toInt))))
 
+    // Get coordinates from text.
     def addCoords(coords: Vector[String]) = {
       val tuples = coords.map(n => (n.split(':').head, n.split(':').last))
       val tuplesAgain = tuples.map(n => (n._1.split(',').map(_.toInt), n._2.split(',').map(_.toInt)))
@@ -176,9 +178,8 @@ object formGame {
     addCoords(coords)
     gameMap.initializeEnemyPath(coordList.toVector)
 
-    def doesNotOverlap(coords: Vector[String]) = {
-      gameMap.enemyTravelPath == gameMap.enemyTravelPath.distinct
-    }
+    // Game map does not overlap with itself.
+    def doesNotOverlap(coords: Vector[String]) = gameMap.enemyTravelPath == gameMap.enemyTravelPath.distinct
 
     println(gameMap.enemyTravelPath)
     if (!doesNotOverlap(coords)) throw new IOException("The input path overlaps with itself! Check the input coordinates in gameInformation.txt.")

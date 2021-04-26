@@ -133,7 +133,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   def healthCheckRemoval() = {
      if(this.bounty.isDefined) this.bounty = None
-     emptyDeathMarks
+     emptyDeathMarks()
      val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
      if(list.nonEmpty) {
        list.foreach(n => if(this.getEnemySquares.exists(_.getEnemy == n)){
@@ -189,6 +189,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
       case some: HunterVenkman => new HunterVenkman
       case some: Venkman => new Venkman
       case some: Suzy => new Suzy
+      case some: DancerSuzy => new DancerSuzy
       case some: FatherMerrin => new FatherMerrin
       case some: EnlightenedMerrin => new EnlightenedMerrin
       case some: LightkeeperMerrin => new LightkeeperMerrin
