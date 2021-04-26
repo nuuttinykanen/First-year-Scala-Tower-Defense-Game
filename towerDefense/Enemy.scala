@@ -24,7 +24,7 @@ def getName = this.getClass.toString.drop(5).trim
 
 class Zombie extends Enemy(4, 1, 10, None)
 
-class ZombieHorde extends Enemy(13, 3, 30, Some(new Zombie))
+class ZombieHorde extends Enemy(12, 3, 30, Some(new Zombie))
 
 class MichaelMyers extends Enemy(110, 10, 90, None)
 

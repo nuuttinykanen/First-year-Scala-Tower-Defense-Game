@@ -226,6 +226,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
               if(purchaseCandidate.isDefined && mousePoint.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
                player.hireRecruit(purchaseCandidate.get, new MapSquare(mouseCoord(mousePoint.get).x, mouseCoord(mousePoint.get).y))
                purchaseCandidate = None
+               analyzeRecruit = None
              }
              // CLICKING RECRUITS ON THE MAP TO SEE THEIR INFO DISPLAYED.
              else gameMap(mouseCoord(mousePoint.get)) match {
