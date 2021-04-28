@@ -12,7 +12,7 @@ class Player(health: Int, money: Int, map: LevelMap) {
 
  def getHealth: Int = currentHealth
  def getMoney: Int = currentMoney
- def getRecruits: Buffer[Recruit] = currentRecruits
+ def getRecruits: Vector[Recruit] = currentRecruits.toVector
 
  def isDead = getHealth <= 0
 
@@ -34,14 +34,12 @@ class Player(health: Int, money: Int, map: LevelMap) {
     affordable.toVector
  }
 
- def hireRecruit(recruit: Recruit, square: MapSquare): String = {
+ def hireRecruit(recruit: Recruit, square: MapSquare): Unit = {
    if(affordableRecruits.contains(recruit.getName) && square.isFree && !square.isOccupied) {
      this.getMap.placeRecruit(recruit, square)
      this.currentRecruits += recruit
      this.changeMoney(-1 * recruit.getCost)()
-     s"You recruited ${recruit.getName} for ${recruit.getCost} coins."
    }
-   else "You can't afford that recruit."
  }
 
  def sellRecruit(recruit: Recruit)() =  {
@@ -54,7 +52,6 @@ class Player(health: Int, money: Int, map: LevelMap) {
    if(recruit.getUpgrade.isDefined) {
       val returnRec = this.getMap.upgradeRecruit(recruit)
       this.changeMoney(recruit.getUpgrade.get.getCost * -1)()
-      println(s"You upgraded ${recruit.getName} to ${recruit.getUpgrade.get.getName}")
       returnRec
    }
  }

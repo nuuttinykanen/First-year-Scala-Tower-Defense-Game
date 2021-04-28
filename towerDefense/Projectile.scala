@@ -14,6 +14,7 @@ class Projectile(sender: AttackRecruit, strength: Int, target: Enemy, square: Ma
 
   def move(count: Int): Unit = {
     if(this.getTargetLocation.isDefined) {
+      // IF THE DIFFERENCE IS GREATER ON THE X-AXIS, FIND THE DIRECTION IN WHICH TO APPROACH ON THE X-AXIS. ELSE SAME ON THE Y-AXIS
       if(abs(this.currentLocation.xDiff(getTargetLocation.get)) >= abs(this.currentLocation.yDiff(getTargetLocation.get))) {
         this.currentLocation.xDirectionOf(getTargetLocation.get) match {
          case Some(way) => this.currentLocation = this.map.squareNeighbor(this.currentLocation, way)

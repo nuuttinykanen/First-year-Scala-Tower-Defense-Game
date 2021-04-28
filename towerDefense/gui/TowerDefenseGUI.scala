@@ -32,16 +32,18 @@ object TowerDefenseGUI extends SimpleSwingApplication {
      }
   }
 
-  val timer = new javax.swing.Timer(100, listener)
+  // DEFAULT 60
+  val timer = new javax.swing.Timer(60, listener)
   timer.start()
 
+  // DEFAULT 30
   def scaleNum = 30
 
   def top = new MainFrame {
-    title = "A Night to Remember"
+    title = "Night of Fright"
     contents = gridMap
     size = new Dimension(gameMap.width * scaleNum, gameMap.width * scaleNum)
-    minimumSize = new Dimension(scaleNum, scaleNum)
+    minimumSize = new Dimension(scaleNum * gameMap.width + scaleNum * 4 + scaleNum / 2, scaleNum * gameMap.width + scaleNum / 3)
   }
 
 
@@ -56,7 +58,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
     returnList.toVector
   }
 
-  def getEnemySprite(enemy: Enemy) = {
+  def getEnemySprite(enemy: Enemy): Image = {
     val index = {
       enemy match {
       case some: Zombie => 0
@@ -110,6 +112,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   val gen = new Random()
 
+  // The sprite for when an enemy dies.
   def deathSprite = {
     var file = "towerDefense/graphics/deathflame.png"
     if(gen.nextInt(10) < 3) file = "towerDefense/graphics/deathflame2.png"
@@ -118,6 +121,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
   def getProjecSprite(spriteName: String): BufferedImage = ImageIO.read(new File("towerDefense/graphics/projectiles/" + spriteName + "projec" + ".png"))
 
+  // Projectile sprites.
   var projecSprites = {
      var returnList = collection.mutable.Buffer[BufferedImage]()
      val recruitList = scala.Vector("simon", "vanHelsing", "ash", "chainsawAsh", "macready", "venkman", "suzy")
@@ -127,22 +131,31 @@ object TowerDefenseGUI extends SimpleSwingApplication {
     returnList.toVector
   }
 
-  def getSpriteFromProjec(projectile: Projectile) = {
+  // Gets the correct sprite for each projectile depending on who sent it.
+  def getSpriteFromProjec(projectile: Projectile): Image = {
      val index = {
        projectile.getSender match {
         case some: Simon => 0
+        case some: VampKillerSimon => 0
         case some: VanHelsing => 1
+        case some: SlayerHelsing => 1
         case some: Ash => 2
         case some: ChainsawAsh => 3
         case some: MacReady => 4
+        case some: FlameRJ => 4
+        case some: InfernoRJ => 4
         case some: Venkman => 5
+        case some: CaptVenkman => 5
+        case some: HunterVenkman => 5
         case some: Suzy => 6
+        case some: DancerSuzy => 6
         case _ => 0
        }
      }
      projecSprites(index).getScaledInstance(scaleNum, scaleNum, Image.SCALE_DEFAULT)
  }
 
+ // The rectangles that form each recruit slot within the store.
  val recruitRectangles = {
     var recruitBuffer = scala.collection.mutable.Buffer[Recruit]()
     var rectBuffer = scala.collection.mutable.Buffer[Rectangle2D]()
@@ -156,18 +169,22 @@ object TowerDefenseGUI extends SimpleSwingApplication {
     recruitBuffer.zip(rectBuffer).toVector
  }
 
+ // CHECKS IF MOUSE IS ON THE RECRUIT STORE
  def posOnStore(point: Point): Boolean = recruitRectangles.map(_._2).exists(n => n.contains(point.getX, point.getY))
 
+ // CHECKS IF MOUSE IS ON THE 'START WAVE' BUTTON
  def posOnContinue(point: Point): Boolean = {
   val rectangle = new Rectangle(gameMap.width * scaleNum + (scaleNum * 2), scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
   rectangle.contains(point)
  }
 
+ // CHECKS IF MOUSE IS ON THE UPGRADE BUTTON
  def posOnUpgrade(point: Point): Boolean = {
    val rectangle = new Rectangle(gameMap.width * scaleNum + 3, scaleNum * 17, scaleNum * 2, (gameMap.width.toDouble * scaleNum * 0.1).toInt)
    rectangle.contains(point)
  }
 
+ // CHECKS IF MOUSE IS ON THE SELL BOX
  def posOnSell(point: Point): Boolean = {
    val rectangle = new Rectangle(gameMap.width * scaleNum, scaleNum * 16 + scaleNum / 2 - scaleNum / 4, scaleNum * 4, scaleNum / 2 + scaleNum / 4)
    rectangle.contains(point)
@@ -185,9 +202,11 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
  val gridMap: Component = new Component {
 
-      var color = Color.black
+      // The optional recruit that the GUI displays more info on (stats, range)
       var analyzeRecruit: Option[Recruit] = None
+      // The optional recruit which the player plans to purchase from the store. For visual recruit placement purposes.
       var purchaseCandidate: Option[Recruit] = None
+
       var mousePoint: Option[Point] = None
       var mouseJustPressed = false
 
@@ -248,13 +267,16 @@ object TowerDefenseGUI extends SimpleSwingApplication {
 
       drawMap(g)
 
+      // DRAW PROJECTILES
       for(each <- gameMap.getProjectiles.map(_.getLocation)) {
           g.setColor(Color.BLACK)
           g.drawImage(getSpriteFromProjec(gameMap.getProjectiles.find(_.getLocation == each).get), each.x * scaleNum, each.y * scaleNum, null)
       }
 
+      // DRAW ENEMY DEATH SPRITE
       for(each <- gameMap.getDeathMarks) g.drawImage(deathSprite, each.x * scaleNum, each.y * scaleNum - scaleNum, null)
 
+      // DRAW SELECTED RECRUIT RANGE
       if(analyzeRecruit.isDefined && analyzeRecruit != purchaseCandidate && gameMap.getRecruits.contains(analyzeRecruit.get)) {
          for(each <- gameMap.squaresInRange(analyzeRecruit.get, analyzeRecruit.get.getLocation)) {
             g.setColor(Color.MAGENTA)
@@ -262,6 +284,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
         }
       }
 
+      // DRAW PURCHASE CANDIDATE AND ITS RANGE
       if(mousePoint.isDefined && gameMap.contains(mouseCoord(mousePoint.get))) {
         if(purchaseCandidate.isDefined && gameMap(mouseCoord(mousePoint.get)).isFree) {
             for(each <- gameMap.squaresInRange(purchaseCandidate.get, gameMap(mouseCoord(mousePoint.get)))) {
@@ -307,7 +330,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
                g.setColor(Color.WHITE)
                square.getRecruit match {
                  case some: AttackRecruit => {
-                   g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum + (scaleNum - 4), ((1 - some.cooldownPerc) * scaleNum).toInt, 3)
+                   g.fillRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum + (scaleNum - 4), ((1 - some.cooldownPercentage) * scaleNum).toInt, 3)
                     g.setColor(Color.BLACK)
                    g.drawRect(each._1 * scaleNum, each._2 * scaleNum - scaleNum + (scaleNum - 4), scaleNum, 3)
                  }
@@ -342,7 +365,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
             row += 1
             g.setFont(Font(Font.Serif, Font.Bold, (scaleNum / 3)))
             g.drawString(s"${each.getCost} G", recStoreCoords(row).x + 40, recStoreCoords(row).y - 18)
-            g.setFont(Font(Font.Serif, Font.Bold, (scaleNum * 3) / (scaleNum / 5 + each.getName.length / 2)))
+            g.setFont(Font(Font.Serif, Font.Bold, ((scaleNum * 4) / (scaleNum / 5 + each.getName.length / 2))))
             g.drawString(s"${each.getName}", recStoreCoords(row).x + 40, recStoreCoords(row).y - 5)
             g.setColor(Color.DARK_GRAY)
         }
@@ -376,7 +399,7 @@ object TowerDefenseGUI extends SimpleSwingApplication {
           g.drawString(s"Range: ${analyzeRec.get.getRange}", gameMap.width * scaleNum + 2, scaleNum * 11)
           g.drawString(s"Strength: ${analyzeRec.get.getStrength}", gameMap.width * scaleNum + 2, scaleNum * 11 + scaleNum / 2)
           analyzeRec.get match {
-            case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + 2, scaleNum * 12)
+            case some: AttackRecruit => g.drawString(s"Cooldown: ${some.currentCooldown}", gameMap.width * scaleNum + 2, scaleNum * 12)
             case _ =>
           }
           var num = 0
@@ -404,12 +427,12 @@ object TowerDefenseGUI extends SimpleSwingApplication {
           g.setColor(Color.WHITE)
           g.drawString(s"Upgrade to", gameMap.width * scaleNum + 2, scaleNum * 14)
              g.setFont(Font(Font.Serif, Font.Plain, 11))
-          g.drawString(s"${upgrade.getName}", gameMap.width * scaleNum, scaleNum * 14 + scaleNum / 2)
+          g.drawString(s"${upgrade.getName}", gameMap.width * scaleNum + 1, scaleNum * 14 + scaleNum / 2)
           g.drawString(s"Range: ${upgrade.getRange}", gameMap.width * scaleNum + 2, scaleNum * 15)
           g.drawString(s"Strength: ${upgrade.getStrength}", gameMap.width * scaleNum + 2, scaleNum * 15 + scaleNum / 2)
 
           upgrade match {
-              case some: AttackRecruit => g.drawString(s"Cooldown: ${some.getCooldown}", gameMap.width * scaleNum + 2, scaleNum * 16)
+              case some: AttackRecruit => g.drawString(s"Cooldown: ${some.currentCooldown}", gameMap.width * scaleNum + 2, scaleNum * 16)
               case _ =>
             }
 

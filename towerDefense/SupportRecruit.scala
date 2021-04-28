@@ -4,7 +4,7 @@ abstract class SupportRecruit(name: String, description: String, strength: Int, 
    def supportEffect(square: MapSquare): Unit
 }
 
-class FatherMerrin extends SupportRecruit("Father Merrin", s"Reduces the countdown of every recruit in its range by strength.", 1, 1, 800, Some(new EnlightenedMerrin)) {
+class FatherMerrin extends SupportRecruit("Father Merrin", s"Reduces the countdown of every recruit in its range by strength.", 1, 1, 1000, Some(new EnlightenedMerrin)) {
 
   def supportEffect(square: MapSquare): Unit = {
     square match {
@@ -20,7 +20,7 @@ class FatherMerrin extends SupportRecruit("Father Merrin", s"Reduces the countdo
 
 }
 
-class EnlightenedMerrin extends SupportRecruit("Enlightened Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 1, 800, Some(new LightkeeperMerrin)) {
+class EnlightenedMerrin extends SupportRecruit("Enlightened Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 1, 1200, Some(new LightkeeperMerrin)) {
 
   def supportEffect(square: MapSquare): Unit = {
     square match {
@@ -35,7 +35,7 @@ class EnlightenedMerrin extends SupportRecruit("Enlightened Merrin", s"Reduces t
   }
 }
 
-class LightkeeperMerrin extends SupportRecruit("Lightkeeper Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 2, 1000, None) {
+class LightkeeperMerrin extends SupportRecruit("Lightkeeper Merrin", s"Reduces the countdown of every recruit in its range by strength.", 2, 2, 1400, None) {
 
   def supportEffect(square: MapSquare): Unit = {
     square match {
@@ -48,10 +48,9 @@ class LightkeeperMerrin extends SupportRecruit("Lightkeeper Merrin", s"Reduces t
       case _ =>
     }
   }
-
 }
 
-class DrFrankenstein extends SupportRecruit("Dr. Frankenstein", "Extends the range of all attacking recruits within his range by strength.", 1, 1, 500, Some(new MadDrFrankenstein)) {
+class DrFrankenstein extends SupportRecruit("Dr. Frankenstein", "Extends the range of all attacking recruits within his range by strength.", 1, 1, 1100, Some(new MadDrFrankenstein)) {
   def supportEffect(square: MapSquare): Unit = {
     square match {
       case attSquare: RecruitSquare => {
@@ -65,7 +64,7 @@ class DrFrankenstein extends SupportRecruit("Dr. Frankenstein", "Extends the ran
   }
 }
 
-class MadDrFrankenstein extends SupportRecruit("Mad Dr. Frankenstein", "Extends the range of all attacking recruits within his range by strength.", 2, 1, 550, Some(new InsaneDrFrankenstein)) {
+class MadDrFrankenstein extends SupportRecruit("Mad Frankenstein", "Extends the range of all attacking recruits within his range by strength.", 2, 1, 1100, Some(new InsaneDrFrankenstein)) {
   def supportEffect(square: MapSquare): Unit = {
     square match {
       case attSquare: RecruitSquare => {
@@ -79,7 +78,7 @@ class MadDrFrankenstein extends SupportRecruit("Mad Dr. Frankenstein", "Extends 
   }
 }
 
-class InsaneDrFrankenstein extends SupportRecruit("INSANE Dr. Frankenstein", "Extends the range of all attacking recruits within his range by strength.", 2, 2, 600, None) {
+class InsaneDrFrankenstein extends SupportRecruit("INSANE Frankenstein", "Extends the range of all attacking recruits within his range by strength.", 2, 2, 1200, None) {
   def supportEffect(square: MapSquare): Unit = {
     square match {
       case attSquare: RecruitSquare => {

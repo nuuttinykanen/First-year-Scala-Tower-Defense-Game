@@ -11,8 +11,8 @@ object formGame {
   val sourceFile = "towerDefense/gameInfo/gameInformation.txt"
   var sourceFileText = mutable.Buffer[String]()
 
-  var gamePlayer = new Player(100, 300, new LevelMap(200))
-  var gameMap = new LevelMap(200)
+  var gamePlayer = new Player(100, 300, new LevelMap(20))
+  var gameMap = new LevelMap(20)
   var waves: Option[Map[Int, Wave]] = None
 
   def readFile = {
@@ -43,7 +43,7 @@ object formGame {
 
     text.head.take(6) match {
       case "PLAYER" => gamePlayer = formPlayer(text.take(2))
-      case _ => throw new IOException()
+      case _ => throw new IOException("Failed to read input data.")
     }
 
     // GET ENEMY WAVES FROM TEXT
@@ -88,7 +88,6 @@ object formGame {
       playerData = playerData.drop(6)
     }
 
-    gameMap = new LevelMap(20)
     initializeMap(gameMap, mapData)
 
     new Player(startHealth, startMoney, gameMap)
@@ -113,6 +112,8 @@ object formGame {
     }
     enemyMap
   }
+
+
 
   def initializeMap(map: LevelMap, coordsText: String) = {
 
@@ -181,7 +182,6 @@ object formGame {
     // Game map does not overlap with itself.
     def doesNotOverlap(coords: Vector[String]) = gameMap.enemyTravelPath == gameMap.enemyTravelPath.distinct
 
-    println(gameMap.enemyTravelPath)
     if (!doesNotOverlap(coords)) throw new IOException("The input path overlaps with itself! Check the input coordinates in gameInformation.txt.")
   }
 }

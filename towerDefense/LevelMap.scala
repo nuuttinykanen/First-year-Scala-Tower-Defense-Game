@@ -9,7 +9,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   /** SETUP */
 
-  def initialElements = for (y <- 0 until this.height; x <- 0 until this.width) yield new FreeSquare(x, y)
+  def initialElements: IndexedSeq[FreeSquare] = for (y <- 0 until this.height; x <- 0 until this.width) yield new FreeSquare(x, y)
 
   def initializeEnemyPath(vector: Vector[GridPos]) = {
      for(each <- vector) {
@@ -23,38 +23,34 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   var enemyTravelPath = Buffer[GridPos]()
 
   def getEnemySquares = {
-    var locationList = Buffer[GridPos]()
     var filtered = this.allElements.filter(_.isInstanceOf[EnemySquare])
     filtered.map(_.asInstanceOf[EnemySquare])
   }
 
   def getEnemiesOnPath = {
     val elements = this.enemyTravelPath.map(n => this.elementAt(n))
-    elements.filter(_.isInstanceOf[EnemySquare]).map(_.asInstanceOf[EnemySquare]).reverse
+    elements.filter(_.isInstanceOf[EnemySquare]).map(_.asInstanceOf[EnemySquare]).reverse.toVector
   }
 
-  def moveEnemy(enemySquare: EnemySquare)() = {
-    val currentIndex = enemyTravelPath.indexOf(enemySquare)
+  def moveEnemy(square: EnemySquare)() = {
+    val currentIndex = enemyTravelPath.indexOf(square)
     val currentPos = enemyTravelPath(currentIndex)
     val newCurrentSquare = new EnemyPathSquare(currentPos.x, currentPos.y)
 
     this.update(currentPos, newCurrentSquare)
 
-    val nextIndex = currentIndex + 1
-    val nextPos = enemyTravelPath(nextIndex)
-    val newSquare = new EnemySquare(nextPos.x, nextPos.y, enemySquare.getEnemy)
+    val nextPos = enemyTravelPath(currentIndex + 1)
+    val newSquare = new EnemySquare(nextPos.x, nextPos.y, square.getEnemy)
 
     this.update(nextPos, newSquare)
   }
 
   def moveEnemies() = {
-    if(this.penaltyHealth.isDefined) this.penaltyHealth = None
     checkLastSquare()
     this.getEnemiesOnPath.foreach(moveEnemy(_)())
   }
 
-
-  def getEnemySpawn = {
+  def getEnemySpawn: GridPos = {
     if(enemyTravelPath.nonEmpty) enemyTravelPath.head
     else GridPos(0, 0)
   }
@@ -66,18 +62,16 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   def removeAllEnemies() = this.getEnemySquares.foreach(n => this.removeEnemy(GridPos(n.x, n.y)))
 
-   def placeEnemy(enemy: Enemy, location: GridPos) = {
+  def placeEnemy(enemy: Enemy, location: GridPos) = {
     if(this.elementAt(location).isInstanceOf[EnemyPathSquare] && !this.elementAt(location).isOccupied) {
        this.update(location, new EnemySquare(location.x, location.y, enemy))
     }
-    else println("FAILED TO PLACE ENEMY")
   }
 
   def removeEnemy(location: GridPos) = {
      this.elementAt(location) match {
        case square: EnemySquare => {
           if(replaceWithInner(square.getEnemy) && location != this.enemyTravelPath.last) {
-            println("REPLACED ENEMY")
           }
           else {
             this.update(location, new EnemyPathSquare(location.x, location.y))
@@ -87,35 +81,13 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
      }
   }
 
-  private var penaltyHealth: Option[Int] = None
-  def getPenaltyHealth = this.penaltyHealth
-
-  private var bounty: Option[Int] = None
-  def getBounty = this.bounty
-
-
-  /** PROJECTILES */
-
-  private var projectiles = Buffer[Projectile]()
-  def getProjectiles = projectiles
-  def addProjectile(projectile: Projectile) = projectiles += projectile
-  def removeProjectile(projectile: Projectile) = {
-    if(this.projectiles.contains(projectile)) projectiles -= projectile
-  }
-  def scanProjectiles() = {
-    val list = this.getProjectiles.filter(_.getTargetLocation.isEmpty)
-    if(list.nonEmpty) list.foreach(this.removeProjectile(_))
-  }
-
-
-
-  def getLastSquare = {
+ def getLastSquare = {
     val list = this.getEnemySquares.filter(_ == this.enemyTravelPath.last)
     if(list.nonEmpty) list.headOption
     else None
-  }
+ }
 
-  def checkLastSquare() = {
+ def checkLastSquare() = {
     if(getLastSquare.isDefined) {
      this.penaltyHealth = Some(getLastSquare.get.getEnemy.getAttack)
      this.removeEnemy(getLastSquare.get)
@@ -132,7 +104,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   }
 
   def healthCheckRemoval() = {
-     if(this.bounty.isDefined) this.bounty = None
+     if(this.bounty.isDefined) emptyBounty()
      emptyDeathMarks()
      val list = this.getEnemySquares.map(_.getEnemy).filter(_.getHealth < 1)
      if(list.nonEmpty) {
@@ -149,13 +121,47 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
      }
   }
 
-  def getRecruitSquares = this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
+
+  // HERE IS THE DAMAGE THE PLAYER TAKES WHEN AN ENEMY REACHES THE END, UPDATED FOR EACH PASS OF TIME.
+  private var penaltyHealth: Option[Int] = None
+  def getPenaltyHealth = this.penaltyHealth
+  def emptyPenaltyHealth() = penaltyHealth = None
+
+  // HERE IS ALL THE BOUNTY GATHERED TO BE GIVEN TO THE PLAYER IN A SINGLE PASS OF TIME.
+  private var bounty: Option[Int] = None
+  def getBounty = this.bounty
+  def emptyBounty() = bounty = None
+
+
+  // DEATH MARKS MARK WHERE AN ENEMY DIED FOR THE GUI TO DRAW A DEATH SPRITE
+  private var deathMarks = collection.mutable.Buffer[MapSquare]()
+  def getDeathMarks = this.deathMarks.toVector
+  def emptyDeathMarks() = deathMarks = deathMarks.empty
+
+ /** PROJECTILES */
+
+  private var projectiles = Buffer[Projectile]()
+  def getProjectiles = projectiles
+  def addProjectile(projectile: Projectile) = projectiles += projectile
+  def removeProjectile(projectile: Projectile) = {
+    if(this.projectiles.contains(projectile)) projectiles -= projectile
+  }
+
+  // REMOVE ALL PROJECTILES WITHOUT TARGETS
+  def scanProjectiles() = {
+    val list = this.getProjectiles.filter(_.getTargetLocation.isEmpty)
+    if(list.nonEmpty) list.foreach(this.removeProjectile(_))
+  }
+
+  /** RECRUITS */
+
+  def getRecruitSquares: Vector[RecruitSquare] = this.allElements.filter(_.isInstanceOf[RecruitSquare]).map(_.asInstanceOf[RecruitSquare])
 
   def getAttackRecruits: Vector[AttackRecruit] = getRecruitSquares.map(_.getRecruit).filter(_.isInstanceOf[AttackRecruit]).map(_.asInstanceOf[AttackRecruit])
 
   def getSupportRecruits: Vector[SupportRecruit] = getRecruitSquares.map(_.getRecruit).filter(_.isInstanceOf[SupportRecruit]).map(_.asInstanceOf[SupportRecruit])
 
-  def getRecruits = getRecruitSquares.map(_.getRecruit)
+  def getRecruits: Vector[Recruit] = getRecruitSquares.map(_.getRecruit)
 
   def placeRecruit(recruit: Recruit, location: GridPos) = {
     if(this.contains(location) && this.elementAt(location).isInstanceOf[FreeSquare]) {
@@ -170,31 +176,27 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
      }
   }
 
-  private var deathMarks = collection.mutable.Buffer[MapSquare]()
-  def getDeathMarks = this.deathMarks
-  def emptyDeathMarks() = deathMarks = deathMarks.empty
-
   def matchRecruit(recruit: Recruit) = {
     recruit match {
       case some: Simon => new Simon
-      case some: VampKillerSimon => new VampKillerSimon
-      case some: VanHelsing => new VanHelsing
-      case some: SlayerHelsing => new SlayerHelsing
-      case some: Ash => new Ash
-      case some: ChainsawAsh => new ChainsawAsh
-      case some: MacReady => new MacReady
-      case some: FlameRJ => new FlameRJ
-      case some: InfernoRJ => new InfernoRJ
-      case some: CaptVenkman => new CaptVenkman
-      case some: HunterVenkman => new HunterVenkman
-      case some: Venkman => new Venkman
-      case some: Suzy => new Suzy
-      case some: DancerSuzy => new DancerSuzy
-      case some: FatherMerrin => new FatherMerrin
-      case some: EnlightenedMerrin => new EnlightenedMerrin
-      case some: LightkeeperMerrin => new LightkeeperMerrin
-      case some: DrFrankenstein => new DrFrankenstein
-      case some: MadDrFrankenstein => new MadDrFrankenstein
+      case some: VampKillerSimon =>      new VampKillerSimon
+      case some: VanHelsing =>           new VanHelsing
+      case some: SlayerHelsing =>        new SlayerHelsing
+      case some: Ash =>                  new Ash
+      case some: ChainsawAsh =>          new ChainsawAsh
+      case some: MacReady =>             new MacReady
+      case some: FlameRJ =>              new FlameRJ
+      case some: InfernoRJ =>            new InfernoRJ
+      case some: CaptVenkman =>          new CaptVenkman
+      case some: HunterVenkman =>        new HunterVenkman
+      case some: Venkman =>              new Venkman
+      case some: Suzy =>                 new Suzy
+      case some: DancerSuzy =>           new DancerSuzy
+      case some: FatherMerrin =>         new FatherMerrin
+      case some: EnlightenedMerrin =>    new EnlightenedMerrin
+      case some: LightkeeperMerrin =>    new LightkeeperMerrin
+      case some: DrFrankenstein =>       new DrFrankenstein
+      case some: MadDrFrankenstein =>    new MadDrFrankenstein
       case some: InsaneDrFrankenstein => new InsaneDrFrankenstein
       case _ => throw new IOException("Failed to find upgrade for recruit!")
       }
@@ -237,7 +239,6 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 
   def attack(recruit: AttackRecruit) = {
      if(getTargetLocation(recruit).isDefined && recruit.canAttack) {
-       println(s"${recruit.getName} attacks!")
        val newProjectile = createProjectile(recruit)
        this.addProjectile(newProjectile)
        recruit.restartCooldown()
@@ -245,9 +246,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
      else if(getTargetLocation(recruit).isDefined) recruit.reload()
   }
 
-  def getFarthestEnemy(list: Vector[Enemy]) = {
-     list.maxBy(n => enemyTravelPath.indexOf(getEnemyLocation(n).get))
-  }
+  def getFarthestEnemy(list: Vector[Enemy]) = list.maxBy(n => enemyTravelPath.indexOf(getEnemyLocation(n).get))
 
   def getTargetLocation(recruit: AttackRecruit): Option[EnemySquare] = {
      if(enemiesInRange(recruit).nonEmpty) this.getEnemyLocation(this.getFarthestEnemy(enemiesInRange(recruit)))
@@ -257,6 +256,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
   def createProjectile(recruit: AttackRecruit) = {
      val target = enemiesInRange(recruit).head
      val spawnLoc: MapSquare = {
+        // IF THE DIFFERENCE IS GREATER ON THE X-AXIS COMPARED TO THE TARGET ENEMY, FIND THE DIRECTION IN WHICH TO SPAWN ON THE X-AXIS. ELSE SAME ON THE Y-AXIS
         if(abs(recruit.getLocation.xDiff(getTargetLocation(recruit).get)) >= abs(recruit.getLocation.yDiff(getTargetLocation(recruit).get))) {
           recruit.getLocation.xDirectionOf(getTargetLocation(recruit).get) match {
            case Some(way) => this.squareNeighbor(recruit.getLocation, way)
@@ -273,6 +273,7 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
    new Projectile(recruit, recruit.getStrength, target, spawnLoc, this)
  }
 
+ // SUPPORT EFFECT FOR ALL SQUARES IN A SUPPORTRECRUIT'S RANGE
  def supportAura(recruit: SupportRecruit) = {
     var auraList = collection.mutable.Buffer[MapSquare]()
     def scanRange(location: RecruitSquare) = {
@@ -292,10 +293,6 @@ class LevelMap(size: Int) extends Grid[MapSquare](size, size) {
 }
 
 class MapSquare(x: Int, y: Int) extends GridPos(x, y) {
-
-  def getX = x
-  def getY = y
-  def getGridPos = new GridPos(x, y)
 
   var enemyPath = false
   var free = true

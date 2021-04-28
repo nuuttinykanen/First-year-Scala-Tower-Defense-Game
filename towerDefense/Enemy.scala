@@ -20,16 +20,17 @@ def changeHealth(amount: Int)() = currentHealth += amount
 def getInnerEnemy = this.innerEnemy
 
 def getName = this.getClass.toString.drop(5).trim
+
 }
 
-class Zombie extends Enemy(4, 1, 10, None)
+class Zombie extends Enemy(4, 1, 19, None)
 
-class ZombieHorde extends Enemy(12, 3, 30, Some(new Zombie))
+class ZombieHorde extends Enemy(8, 2, 40, Some(new Zombie))
 
-class MichaelMyers extends Enemy(110, 10, 90, None)
+class MichaelMyers extends Enemy(80, 5, 100, None)
 
-class Dracula extends Enemy(200, 10, 400, None)
+class Dracula extends Enemy(150, 8, 400, None)
 
-class Bat extends Enemy(4, 10, 2, Some(new Dracula))
+class Bat extends Enemy(4, 10, 1, Some(new Dracula))
 
 

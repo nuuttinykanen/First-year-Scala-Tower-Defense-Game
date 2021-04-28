@@ -9,10 +9,6 @@ class Wave(enemyMap: Map[Enemy, Int]) {
 
  private var enemyList = enemyMap
 
- def enemyOnTop = {
-   if(enemyList.nonEmpty) enemyList.head._1
- }
-
  def removeEnemy(enemy: Enemy) = {
    if(enemyList.keys.exists(_ == enemy)) {
       val key = enemyList.keys.find(_ == enemy).get
@@ -23,10 +19,7 @@ class Wave(enemyMap: Map[Enemy, Int]) {
    }
  }
 
- def waveSize = this.enemyMap.values.sum
-
  def getEnemyList = enemyList
-
  def enemyListEmpty = enemyList.isEmpty
 
  def popNext = {
